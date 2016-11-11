@@ -14,6 +14,9 @@ OBJ = perforatore.o
 main: $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o perforatore -L$(CPX_LDPATH) $(CPX_LDADD)
 
+istanze: creaIstanze.o punto.o
+	$(CXX) $(CXXFLAGS) -o istanze creaIstanze.o punto.o
+
 clean:
 	rm -rf $(OBJ) perforatore
 

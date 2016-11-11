@@ -1,0 +1,5 @@
+
+Prossimi TODO nel progetto
+- controllare se l'esercizio 1 è scritto bene con l'attuale modello.
+- sistemare il txt della matrice di distanze tra nodi (nella prima riga del file inserire il numero di nodi)
+- sistemare il perforatore con il nuovo dato di input (file di testo contenente numero nodi e matirce adiacenze)

@@ -11,24 +11,24 @@ using namespace std;
 int main(int argc, char* argv[]){
 	random_device rd;
 	mt19937 mt_generator(rd());
-	uniform_int_distribution<int> distribution(0,RAND_MAX);		// da sostituire con 
-
-	cout << "-----Genero istanze------" << endl;
-	cout << "RAND_MAX: "<< RAND_MAX<<endl;
+	uniform_int_distribution<int> distribution(0,10000);		// da sostituire con 
+	
 	int N = 10;					// numero di nodi dell'istanza
 	double M[N][N] {0.0};
 	vector<Punto> arr_nodi;
+        cout << "-----Genero "<<N<<" istanze------" << endl;
+	cout << "RAND_MAX: "<< RAND_MAX<<endl;
 	
 // -----	CREAZIONE NODI		--------
 	for(int k=0; k<N; k++){			// popola vector
 		Punto nuovo(distribution(mt_generator),distribution(mt_generator));
-		if (k==3||k==4)
-			nuovo = Punto(3,5);
+		//if (k==3||k==4)
+		//	nuovo = Punto(3,5);
 		bool trovato = true;
 		while (trovato){				// crea nuovi nodi se quello generato è uguale ad uno dei precedenti
 			trovato = false;
 			for (int s=0; s<arr_nodi.size() && not trovato; s++){
-				Punto 
+                                //Punto ciccio(arr_nodi[s]);
 				trovato = (arr_nodi[s]==nuovo);
 				}
 			if (trovato){
@@ -67,6 +67,7 @@ int main(int argc, char* argv[]){
 // -----	SCRITTURA MATRICE SU FILE		--------		
 	FILE* pFile;
 	pFile = fopen("istanza10b.txt", "w");
+        fprintf(pFile, " N = %d \n", N);
 	for (int i=0; i<N; i++){
 		for(int j=0; j<N; j++)
 		//fwrite (M[i], sizeof(double), sizeof(M[i]), pFile);

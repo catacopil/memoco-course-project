@@ -161,33 +161,47 @@ int indiciY[N][N];
 }
 
 int main(int argc, char const *argv[]) {
-	int numeroNodi;										// numero di nodi del problema
+	int numeroNodi=10;										// numero di nodi del problema
 	string fileName;									// nome del file che contiene l'istanza del problema
 	ifstream lettoreIstanza;
-	if (argc != 3){
+	if (argc != 2){
 		std::cout << "Errore: argomenti non sufficienti, argc= "<< argc << endl;
 		for(int i=0; i<argc; i++)
 			cout << argv[i]<< " ";
 		return 0;
 	}
 	try{
-		numeroNodi = std::stoi(argv[1]);
-		fileName = argv[2];
+		fileName = argv[1];
 	}
 	catch (std::exception& e) {
         std::cout << ">>>Eccezione durante lettura parametri: " << e.what() << std::endl;
         return 0;
 	}
-	double distanze[numeroNodi][numeroNodi];				// matrice con le distanze del problema
-	try{		// lettura file istanza
-		lettoreIstanza.open(fileName);
+        // lettura della prima riga
+        try{
+            lettoreIstanza.open(fileName);
+            char* in = new char[100];
+            lettoreIstanza.getline(in,100);
+            string primaLinea(in);
+            primaLinea.erase(0,4);
+            numeroNodi = stoi(primaLinea);
+            cout << "Nodi: " << numeroNodi << endl;
+        }
+        catch (std::exception& e) {
+        std::cout << ">>>Eccezione durante lettura file istanza: " << e.what() << std::endl;
+        return 0;
+	}
+        double distanze[numeroNodi][numeroNodi];				
+        try{
+            // matrice con le distanze del problema
+            // lettura file istanza
 		for(int i=0; i<numeroNodi; i++)
-			for(int j=0; j<numeroNodi; j++){
-				if (lettoreIstanza.is_open()){
-					double num;
-					if (lettoreIstanza >> num)
-						distanze[i][j] = num;
-				}
+                    for(int j=0; j<numeroNodi; j++){
+                        if (lettoreIstanza.is_open()){
+                            double num;
+                            if (lettoreIstanza >> num)
+				distanze[i][j] = num;
+                            }
 			}
 		// STAMPA DELLA MATRICE LETTA
 		/*for(int i=0; i<numeroNodi; i++){
@@ -196,7 +210,7 @@ int main(int argc, char const *argv[]) {
 				}
 			cout << " |" << endl;
 			} */
-	}
+            }
 	catch (std::exception& e) {
         std::cout << ">>>Eccezione durante lettura file istanza: " << e.what() << std::endl;
         return 0;

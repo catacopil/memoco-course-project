@@ -16,3 +16,7 @@ string Punto::stampa(){
 	out << "Punto: (" << x << ", " << y << ")";
 	return out.str();
 	}
+
+bool Punto::operator==(const Punto &p) const {
+        return (x==p.x && y==p.y);
+    }
