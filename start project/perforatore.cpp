@@ -44,6 +44,7 @@ int indiciY[N][N];
     }
 // --------  AGGIUNTA VARIABILI AL MODELLO -------
 // crea le variabili x_ij e y_ij, specificandone tipo, limiti del dominio (lb ed ub), nome e costo in funzione obiettivo
+    // ----- VARIABILI X
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
 			if (i==j) continue;
@@ -57,16 +58,17 @@ int indiciY[N][N];
             CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, 0, &lb, &ub, &xtype, &xname );    // lo zero in posizione obj e' il coefficiente della variabile nella funzione obiettivo
 		}
 	}
-	for (int i = 0; i < N; i++) {
+    // ----- VARIABILI Y
+    for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
 			if (i==j) continue;
-            char xtype = 'I';
+            char ytype = 'I';
             double lb = 0;
             double ub = 1;
             snprintf(name, NAME_SIZE, "Y_%d_%d", i, j);
-            char* xname = (char*)(&name[0]);
+            char* yname = (char*)(&name[0]);
             // inserimento delle variabili Y_i_j nel modello
-            CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &C[i*N+j], &lb, &ub, &xtype, &xname );
+            CHECKED_CPX_CALL( CPXnewcols, env, lp, 1, &C[i*N+j], &lb, &ub, &ytype, &yname );
         }
     }
 
@@ -74,11 +76,11 @@ int indiciY[N][N];
 	// Aggiunta vincolo 1 
 
     std::vector<int> idx1(N-1);
-    std::vector<double> coef1(N-1, 1);
+    std::vector<double> coef1(N-1, 1);          // vector con N-1 elementi di valore 1.0
     char sense1 = 'E';
     int matbeg1 = 0;
     for (int i = 0; i < idx1.size(); i++){
-		idx1[i]=i+((nodoStart+1)*(N-1)-N+1);
+		idx1[i]=i+((nodoStart+1)*(N-1)-N+1);            //TODO: perché non uso le matrici per recuperare gli indici
 	}
 	double terminiNoti[1] = {N};
 	CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idx1.size(), terminiNoti, &sense1, &matbeg1, &idx1[0], &coef1[0], NULL , NULL );
@@ -88,29 +90,28 @@ int indiciY[N][N];
 	// Aggiunta vincolo 2
 	for (int k = 0; k < N; k++){
 		if (k==nodoStart) continue;
-        std::vector<int> idx((N-1)*2);
-        std::vector<double> coef((N-1)*2, 1);        // coeff contiene solo i coefficienti diversi da zero
-        char sense = 'E';
-        int index = 0;
-        for (int j = 0; j <= (N-1); j++){
-			if (j==k) continue;
-            idx[index] = indiciX[j][k];
-            index++;
+            std::vector<int> idx((N-1)*2);
+            std::vector<double> coef((N-1)*2, 1);        // coeff contiene solo i coefficienti diversi da zero
+            char sense = 'E';
+            int index = 0;
+            for (int j = 0; j <= (N-1); j++){
+                            if (j==k) continue;
+                idx[index] = indiciX[j][k];
+                index++;
+            }
+            for (int j = 0; j <= (N-1); j++){
+                            if (j==k) continue;
+                idx[index] = indiciX[k][j];
+                coef[index]=-1;
+                index++;
+            }
+            int matbeg = 0;
+            double termineNoto[1] = {1};
+            CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idx.size(), termineNoto, &sense, &matbeg, &idx[0], &coef[0], 0, 0 );
         }
-        for (int j = 0; j <= (N-1); j++){
-			if (j==k) continue;
-            idx[index] = indiciX[k][j];
-            coef[index]=-1;
-            index++;
-        }
-        int matbeg = 0;
-        double termineNoto[1] = {1};
-        CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idx.size(), termineNoto, &sense, &matbeg, &idx[0], &coef[0], 0, 0 );
-    }
 	
 	//Aggiunta vincolo 3
-    for (int i = 0; i < N; i++)
-    {
+    for (int i = 0; i < N; i++){
         std::vector<int> idx(N-1);
         std::vector<double> coef(N-1, 1);        // coeff contiene solo i coefficienti diversi da zero
         char sense = 'E';
@@ -146,17 +147,17 @@ int indiciY[N][N];
     for (int i = 0; i < N; i++){
 	   for (int j = 0; j <= (N-1); j++){
 		 if (j==i) continue;
-         std::vector<int> idx(2);
-         std::vector<double> coef(2, 1);        	// coeff contiene solo i coefficienti diversi da zero
-         coef[1]=-N;
-        
-         char sense = 'L';
-         idx[0]=indiciX[i][j];
-         idx[1]=indiciY[i][j];  
-         int matbeg = 0;
-         double termineNoto[1] = {0};
-         CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idx.size(), termineNoto, &sense, &matbeg, &idx[0], &coef[0], 0, 0 );
-         }
+            std::vector<int> idx(2);
+            std::vector<double> coef(2, 1);        	// coeff contiene solo i coefficienti diversi da zero
+            coef[1]=-N;
+
+            char sense = 'L';
+            idx[0]=indiciX[i][j];
+            idx[1]=indiciY[i][j];  
+            int matbeg = 0;
+            double termineNoto[1] = {0};
+            CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idx.size(), termineNoto, &sense, &matbeg, &idx[0], &coef[0], 0, 0 );
+            }
 	}
 }
 
@@ -171,7 +172,7 @@ int main(int argc, char const *argv[]) {
 		return 0;
 	}
 	try{
-		fileName = argv[1];
+            fileName = argv[1];
 	}
 	catch (std::exception& e) {
         std::cout << ">>>Eccezione durante lettura parametri: " << e.what() << std::endl;
