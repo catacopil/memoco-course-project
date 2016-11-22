@@ -11,9 +11,19 @@ using namespace std;
 int main(int argc, char* argv[]){
 	random_device rd;
 	mt19937 mt_generator(rd());
-	uniform_int_distribution<int> distribution(0,10000);		// da sostituire con 
+	uniform_int_distribution<int> distribution(0,10000);
 	
-	int N = 10;					// numero di nodi dell'istanza
+	int N = 50;					// numero di nodi dell'istanza di default
+        if (argc>=2){
+            try{
+                N = stoi(argv[1]);
+            }
+            catch (std::exception& e) {
+            std::cout << ">>>Eccezione nella lettura parametri input: la sintassi corretta è 'istanza NrNodi' " << e.what() << std::endl;
+            return 0;
+            }
+        }
+            
 	double M[N][N] {0.0};
 	vector<Punto> arr_nodi;
         cout << "-----Genero "<<N<<" istanze------" << endl;
@@ -56,6 +66,7 @@ int main(int argc, char* argv[]){
 			}
 	
 // -----	STAMPA MATRICE		--------
+        /*
 	for(int i=0; i<N; i++){
 		for(int j=0; j<N; j++){
 			cout << M[i][j] << "\t\t";
@@ -63,17 +74,21 @@ int main(int argc, char* argv[]){
 			}
 		cout << " |" << endl;
 		}
+         */
 		
 // -----	SCRITTURA MATRICE SU FILE		--------		
 	FILE* pFile;
-	pFile = fopen("istanza10b.txt", "w");
+        string nomeFileOut = "istanza";
+        nomeFileOut = nomeFileOut+to_string(N)+"nodi.txt";
+	pFile = fopen(nomeFileOut.c_str(), "w");
         fprintf(pFile, " N = %d \n", N);
-	for (int i=0; i<N; i++){
+        for (int i=0; i<N; i++){
 		for(int j=0; j<N; j++)
-		//fwrite (M[i], sizeof(double), sizeof(M[i]), pFile);
-			fprintf(pFile, "%f ",M[i][j]);
+                    fprintf(pFile, "%f ",M[i][j]);
 		fprintf(pFile, " \n");
 		}
 	fclose(pFile);
+        
+    cout << "Generato il file " << nomeFileOut << " con la matrice delle distanze tra i " << N << " nodi" << endl;
 		
 }

@@ -162,8 +162,8 @@ int indiciY[N][N];
 }
 
 int main(int argc, char const *argv[]) {
-	int numeroNodi=10;										// numero di nodi del problema
-	string fileName;									// nome del file che contiene l'istanza del problema
+	int numeroNodi=10;						// numero di nodi del problema
+	string fileName;						// nome del file che contiene l'istanza del problema
 	ifstream lettoreIstanza;
 	if (argc != 2){
 		std::cout << "Errore: argomenti non sufficienti, argc= "<< argc << endl;
