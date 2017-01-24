@@ -1,0 +1,13 @@
+
+Euristiche per il TSP:
+ - Algoritmi di minimi locali (https://heuristicswiki.wikispaces.com/Nearest+Neighbor+%28Heuristic%29)
+ 	
+ 	
+ - Algoritmi greedy (https://heuristicswiki.wikispaces.com/Greedy+%28Heuristic%29)
+ 	https://pdfs.semanticscholar.org/10a0/7530f58f2f1e3cf53011e57b1756c69a7c7f.pdf
+ 	Appunti di UniRoma: http://www.di.unipi.it/optimize/Courses/ROM/1314/Appunti/Cap5.pdf
+ 		Vedere l'idea di 'twice around MST'
+ 	
+ - Algoritmi di insertion (https://heuristicswiki.wikispaces.com/Insertion+%28Heuristic%29)
+ 	
+ 	
