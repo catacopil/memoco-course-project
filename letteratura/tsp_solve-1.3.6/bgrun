@@ -1,0 +1,7 @@
+#!/usr/local/bin/bash
+#
+# run with -p1 stdout output to "10" and stderr output to "10e"
+for a in 25 35 45 55 65 75 85 95; do
+    echo doing $a >> FILE
+    tsp_solve -m5 $a -s815${a}9779 -t100 -dK he r1 r2 >|$a.sp1 2>&1
+done

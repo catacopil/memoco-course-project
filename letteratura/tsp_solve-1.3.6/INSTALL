@@ -1,0 +1,32 @@
+
+Gnu Autoconf has made it possible to make installing a breeze, for the most
+part you should be able to just enter two commands to completely make this
+software "./configure ; make CFLAGS=-O2" it should find the right compilers
+and right options to set if you have all the necessary utilities on your
+system.  If you do not have Gnu make, you may have to append the Makefile.ngn
+to the ./configure created Makefile, so the .cc dependencies can be realized.
+
+If you are really lazy, there is a shell script that will do two commands for
+you called "mak".  If you want to debug tsp_solve, use "./configure ; make".
+Depending on what platform you run, you might see lots of Warnings with a
+-Wall option.  We've tried to gut all the warnings.  However, if you find
+some with a different compiler than gcc, let us know where they are.
+
+If you are very concerend about the data types of the TSP or you need to answer
+specifically following questions:  What is the largest city ID I need to use?
+i.e. Do I need a two byte or one byte city ID type?  Do I need to use floating
+point vs. integer aritmetic for tour lengths?  edge costs?  Then, read the
+first part of stdmacro.h and change the #defines there before compiling.
+
+Borland C++ users must "copy config/borland.h config.h" since the configure
+script probably won't work in msdos.  Also when using a version of Borland
+less than 4.0, #define NO_ARRAY_CONSTRUCTING in your config.h file, since the
+lesser versions of borland do not support automatic constructing of objects
+`new'ed in arrays.
+
+So far tsp_solve has been compiled on DEC, Sun, HP, AIX RSx000, and SCO UNIXes
+with gcc as well as a Borland 3.1, 4.0 compilers for ibm pc's.
+
+If you get another platform to work, please send churritz@cts.com the config.h,
+Makefile.in, configure.in or other source changes that were needed.
+

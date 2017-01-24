@@ -1,0 +1,9 @@
+This directory contains files that create the configure script from the file
+configure.in in the parent directory.  The defines set in configure.in should
+be self explainatory.  The Makefile is a makefile since cleaning removes
+Makefiles.
+
+--
+
+There are also config.h files for platforms that may not be able to run the
+configure script made here.  (i.e. borland.h)

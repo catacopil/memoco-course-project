@@ -1,0 +1,179 @@
+Version 1.3.6
+
+Tue Nov 14 09:54:40 PST 1995
+
+-- added two new random tour finders that use random ropted tours
+
+Version 1.3.5
+
+Mon Jun 12 09:52:44 PDT 1995
+
+-- added usr1sig to parallel processes so they will save they're current info
+   into a new file which is mapped by the hosts file.
+-- finished savings algorithm, not very impressive
+-- sped up hungarian algorithm
+
+Tue May 23 15:06:53 PDT 1995
+
+-- started on savings heuristic
+
+-- rewrote the save and restore structure for the optimal algorithms, this
+   also enabled more use of hiearchical functions that worked for all optimal
+   solvers.
+
+Mon May 15 14:40:17 PDT 1995
+
+-- made k10 swaping mechanism to work with hungaria, doesn't seem to work as
+   good as others.
+
+April 1995
+
+-- added hungaria back in because hungaria now doesn't crash on the 8 city tsp
+   will not keep in public version if i don't get a disclaimer from Bob.
+-- completed arborescnece algorithm, with help of additional paper, also made
+   a faster 1-tree with a N^2 algrorithm rather than the N^2logN algorithm.
+   if SYMMETRY is defined in oneaborq.cc them symmetric 1-tree algorithm is used
+   otherwise the arborescence is used for tour finder "arbor"
+
+Version 1.3.5
+
+Feb 1995
+
+-- added 1-arborescence algorithm for asymmetric tsps which have a matrix where
+   Cij is approximatley close to Cji.  The O(N^2) dense arborescence algorithm
+   was derived from my own interpretation of the dense minimum spaning tree
+   algorithm from Segwick C++ Algorithms.  I found a reference to Optimum
+   branchings by Tarjan, but i found it imobile and uncomprehendable to
+   take seriously. (ceh)
+-- removed hungaria* ant* flexmap* since the algorithms were by other authors
+   and weren't contending with ceh's algorithms, with the exception of
+   hungaria* which performs slightly better for N<13 to optimall solve tsps,
+   than standard*. (ceh)
+
+Tue Jan 03 12:13:28 PST 1995
+
+-- still debuging some parallel miscongruities, rshing doesn't work well (ceh)
+-- finished a new assignment problem algorithm that branches differently from
+   the old, and performs much better (ceh)
+-- also added parallel read/write functions to the new AP algorithm (ceh)
+
+Mon Nov 21 10:49:17 PST 1994
+
+-- finished most of the debugging of the parallel module (ceh)
+-- added christofides heuristic (ceh)
+-- removed threeopt.cc since the R-Opt combined with the old treeopt works
+   faster and better.  now treeopt becomes threeopt (ceh)
+
+Version 1.3.4
+
+-- fixed multifrag heuristic so it would work better (ceh)
+-- implimented Lin and Kernighan R-Opt (1973) from The TSP book (ceh)
+-- enhanced the nearest addition procedure, added angle functionality
+   and made convex hull initial tour for farthest insertion (ceh)
+-- added my own farthest insertion procedure to replace rjc's (ceh)
+-- started to design parrallel processing
+
+Sat Sep 10 22:11:06 PDT 1994
+
+-- added variant kswaping for symmetric TSPs (slower than hoped, ceh)
+-- added 3-opt procedure, for use with "treeopt", much faster but
+   not as completley exhaustive as "threeopt" (ceh)
+-- made Assignment optimal solver work for floating point costs. (ceh)
+-- added Ant Heuristic (ceh)
+-- added multifrag heuristic (ceh)
+
+Mon Jul 04 17:18:05 PDT 1994
+
+-- made kswaping procedure for asymmetric tsps
+-- AP B&B algorithm accomplished as (assign) tourfinder
+-- made fouropt heuristic for asymetric tsps
+-- moved twoopt.cc to nopt.cc
+-- made tsp_solve.tex
+-- fixed some HP Makefile bugs (dkraay@mgmt.purdue.edu)
+
+Version 1.3.3
+
+Sun Jun 05 10:31:57 PDT 1994
+
+-- made Asymmetric 3-Opt procedure "treeopt"
+-- making midget tsp_solve executable linkable for a few tour finders
+-- added oneway input options for oneway TSPs
+-- added -fFilename input option to replace stdin
+-- finished autoconf configure script
+
+Version 1.3.2b
+
+Mon May 23 13:40:51 PDT 1994
+
+-- made tour improvements specifiable in command line interface
+-- made regular one-tree train before branching to improve it slightly
+-- fixed a few bugs sent in by dsj@reserach.att.com
+
+Version 1.2.99b
+
+Wed May 04 18:21:22 PDT 1994
+
+-- separated binfile.cc and io.cc class from term.cc
+-- added clock() Timer class functionality if platforms don't have ftime()
+
+Version 1.2.9b
+
+Sat Apr 30 16:04:53 PDT 1994
+
+-- added Dispersion heuristic (does very well for Asym.TSPs) (Chad Hurwitz)
+-- made config file for DEC (Michael J. Hennebry)
+
+Wed Apr 27 23:09:42 PDT 1994
+
+- added FLEXMAP implimentation (algorithm Bernd Fritzke and Peter Wilke)
+- added circlist object which is a circular list of same base class objects
+
+Tue Apr 26 19:23:04 PDT 1994
+
+- config/linux.h created (Jeff Riegel) riegel@almaden.ibm.com
+
+Tue Apr 26 14:40:13 PDT 1994
+
+- added -d option to overide distance function
+
+Thu Apr 21 13:48:12 PDT 1994
+
+- fixed geographic distance function (G.Reinelt)
+- solved more tsplib instances in TSPS_SOLVED
+- added more tsplib features (UPPER_ROW and LOWER_DIAG_ROW input formats)
+- added ability to use exponetials and negatives in input files
+
+Tue Apr 19 09:43:23 PDT 1994
+
+- took out the global name externs from each tourfinder, since some c++
+  compilers won't use globals in static arrays. (R.J.Craig)
+
+Version 1.2b
+
+Sun Apr 17 10:47:15 PDT 1994
+
+- added TSPLIB input and output options -- and -p4
+- started the TSPS_SOLVED file
+- more porting bugs fixed
+
+Thu Apr 14 15:49:03 PDT 1994
+
+- added config directory for separate platforms
+- added new makefile dependencies to accomodate make "platform" name
+
+Wed Apr 13 22:22:03 PDT 1994
+
+- added hungarian algorithm by R.J. Craig
+
+Tue Apr 12 20:19:21 PDT 1994
+
+- fixed standard solver so it will solve Asymmetric TSPs
+
+Tue Apr 12 09:57:09 PDT 1994 ceh
+
+- changed Hueristic to Heuristic
+- added EasyTour heuristic
+- added -m-2 option to enter a TSP in specified order for the EasyTour
+
+Version 1.1b
+

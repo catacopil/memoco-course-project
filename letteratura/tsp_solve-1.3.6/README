@@ -1,0 +1,236 @@
+TspSolve -- Copyright(c) 1994 Free Software Foundation
+
+This jumble of .cc files is a program that finds heuristic and optimal
+solutions of traveling salesperson problems.
+
+Aside from learning how it to use it by reading the code, there is
+a document tsp_solve.tex that attempts to make the usage understandable.
+You can convert it to tsp_solve.info with the GNU file texinfo.texi in
+the current directory and then running makeinfo tsp_solve.tex.
+
+If you have any trouble with installation or usage, please mail or call
+the following:
+
+Chad Hurwitz
+(619) 565-8656
+churritz@cts.com
+
+--
+
+NOTES FOR v1.3.6:
+
+There has not been a lot of testing with this code, So be prepared for
+problems.  The parrallel implimentation needs a lot of work, but can be
+jimmied to use if you have a good NFS.  The "real" tsp algorithms use
+strict LP relaxations, and tsp_solve doesn't contain any LP code yet,
+so this is really only usefull for small optimal solutiuons 100 cities
+or so, and large 1000 city heuristics solutions.  There may be several
+problems with signals but the KILL signal should always work.
+
+--
+
+NOTES FOR v1.3b:
+
+The Flexmap Implimentation seems to work but not as well as the Flexmap paper
+deems it.  I think a better use of the Constants in flexmap.h may make the
+algorithm find better tours, but for now the Addition tourfinder works much
+better providing shorter tours for Euclidean tsps and much faster than flexmap.
+
+--
+
+CREATING A USER DEFINED TOUR FINDER:
+
+If you are interested in installing a heuristic or tour finder of your own,
+take a look at easytour.cc, which is a sample tour finder that has all the
+necesary member functions a tour finder should have, and describes how
+a tour is built to return to the statistic interface.  Here are the Steps to
+take in order to make sure the new tour finder is installed properly.
+
+[1] typedefs: always use the city_id_t where a city identifier is used, cost_t
+   where the cost from going to one city to another is used, and sum_t where
+   ever an addition of multiple cost_t's is needed.  additionally, the
+   #defines MAX_COST and MAX_SUM should be assumed is the largest value
+   that can exist in cost_t and sum_t respectivley.
+
+[2] make a .cc file and .h file including a class instance of your tourfinder
+   using easytour.cc and easytour.h class as a model.  Make sure that run()
+   returns the percentage left or 0 if there is only one call needed to run().
+   Also construct a tour by looping tour->travel(city_id) along the tour found.
+
+[3] replace any occurances of cout or cin with dump AND cerror with dumpout
+   to use the tsp_solve output facilities.
+
+[4] in choice.cc do three things: (1) #include yourtourfinder.h file,
+   (2) add the full name and abreveiated name as an entry in the choices[]
+   array.  Also Note the index of your entry in this array as "x".
+   (3) Then in the switch_tourfinders() procedure , add something like:
+   case "x": st_tf = new YourTourFinder(m); break;
+
+[5] Finnally stick yourtourfinder.o file (and any other object code files that
+   your tour finer makes calls to) in OBJS in the Makefile and you should
+   be able to use your tour finder as any TOUR FINDER already in existance.
+
+If have any questions or heuristics to contribute (i'm proly more
+interested than you are to have more tour finders in this project),
+churritz@cts.com would be happy to answer any questions about the code.
+
+--
+
+MANIFEST:
+
+CHANGES          File explaining the changes made by time and version
+INSTALL          Some unfinished porting notes
+Makefile.ngn     A Non-Gnu Makefile if you don't have gnu-make
+Makefile.in      File read by configure
+NOTES            Notes and ToDo list
+ONETREEDME       Some ugly almost finished design notes about 1-trees
+PARALLEL         Some more ugly design notes about parallel tsp_solving
+README           I wonder what this file is
+TSPS_SOLVED      A library of different tsps solved by this software.
+addition.cc
+addition.h       The Additon heuristic
+antheur.cc
+antheur.h        The Ant Heuristic
+ants.cc
+ants.h           The Data structures used by the Ant heuristic
+assign.cc
+assign.h         The Assignment Problem Optimal solution solver
+assign.cc
+assignql.h       The AP queue element
+c.cc             A temp c++ file that tests how [de/con]structors are called
+choice.cc
+choice.h         The Switch program that chooses and constructs tour finders
+choice0.cc       An alternative choice.cc for limiting linking
+config/          Directory containing files that help configure.
+config.h.in      File read by configure
+configure        Program to create Makefile and config.h
+data/            Directory where some test tsps are stored in TSPLIB format
+disperse.cc
+disperse.h       The Dispersion Heuristic
+easytour.cc
+easytour.h       Easy Tour finder, just finds a tour in the order of input TSP
+farinsrt.cc
+farinsrt.h       Farthest Insertion Heuristic
+findtour.cc
+findtour.h       A program that invokes algorithms by (char*) names
+flexmap.cc
+flexmap.h        FLEXMAP Hueristic
+hungaria.cc
+hungaria.h       Hungarian Algorithm optimal tour finder (Bob Craig)
+include/         Directory holding global include files
+lib/             Directory holding my own utility and debuging library
+loss.cc
+loss.h           The Loss Heuristic
+main.cc          Mr. Main
+matrix.cc
+matrix.h         Matrix Class
+multfrag.cc
+multfrag.h       The Multiple Fragment Heuristic
+nopt.cc
+nopt.h           N-Opt type heuristic algorithms
+
+oneacity.cc
+oneacity.h       A City Class for the 1-arborescence algorithm
+oneabor.cc
+oneabor.h        The Improved 1-arborescence B&B Tour Finder
+oneaborq.cc
+oneaborq.h       and it's branch queue element
+
+onetcity.cc
+onetcity.h       A City Class for the Improved 1-tree algorithm
+onetree.cc
+onetree.h        The Improved 1-tree B&B Tour Finder
+onetreeq.cc
+onetreeq.h       and it's branch queue element
+
+onetsolv.cc
+onetsolv.h       Another 1-tree B&B Tour Finder, that only performs better in
+onetquel.cc      some circumstances than onteree.h
+onetquel.h       and it's branch queue element counter part
+
+parallel.cc
+parallel.h       Class to parallelize tour finders across multiple machines
+params.cc
+params.h         The command line argument class
+pquelem.cc
+pquelem.h        Base class for B&B queue elements
+pqueue.cc
+pqueue.h         Priority Queue made specially for B&B queues
+shapes.c         Stand Alone program that makes tsp coordinates for shaped tsps
+smatrix.cc
+smatrix.h        Cost Sorted Matrix Class, used by 1-tree B&B's
+solver.cc
+solver.h         Base Class for a Branch and Bound Tour Finder
+standard.cc
+standard.h       A Standard B&B method only fast for very small tsps
+stanquel.cc
+stanquel.h       the branch queue element for the Standard algorithm
+stdmacro.h       standard #defines and typedefs
+term.cc
+term.h           Terminal Input and Output class
+tour.cc
+tour.h           a Tour class
+tourfind.cc
+tourfind.h       Tour Finder Base class
+tsp_solve.tex    A Texinfo document for Tsp_Solve (needs texinfo.tex)
+
+---
+
+ADVERTISEMENT:
+
+I (Chad Hurwitz) am looking for work in this field.  If you are looking for a
+experienced mathematician that can impliment complicated algorithms, please
+request a resume from churritz@cts.com
+
+--
+
+I'd really like to know if anyone has the opportunity to include parts
+of tsp_solve in their own work.  E-Mail churritz@cts.com if that
+opportunity arises.  And for legal purposes also see further below:
+
+If you intend to use the programs of tsp_solve in your own project,
+you must include the contributors of this project somewhere in
+the documentation of your project.  If you do use the programs of
+tsp_solve in your own project, you will do so at your own risk since
+the contributors of tsp_solve will not be held responsible for
+any damages.
+
+This software is copyrighted as noted above.  It is free software 
+and it may be freely copied, modified, and redistributed under the
+following conditions:
+ 
+1. All copyright notices must remain intact in all files.
+ 
+2. A copy of this file (README) must be distributed along with any
+   copies which you redistribute; this includes copies which you have
+   modified, or copies of programs or other software products which
+   include this software.
+ 
+3. If you modify this software, you must include a notice giving the
+   name of the person performing the modification, the date of
+   modification, and the reason for such modification.
+ 
+4. When distributing modified versions of this software, or other
+   software products which include this software, you must provide
+   notice that the original source code may be obtained as noted
+   above.
+ 
+5. There is no warranty or other guarantee of fitness for this
+   software, it is provided solely "as is".  Bug reports or fixes may
+   be sent to churritz@cts.com; the authors may or may not act
+   on them as they desire.
+ 
+--
+
+Future Additions to tsp_solve:
+
+(1) Creating a Parrallel module that will let a group of machines
+(connected via network) combine and use a TourFinder to solve a
+single large TSP, of course faster than a single machine could.
+
+(2) Making a restorable runner class that triggers algorithms and
+remembers which were run and doesn't doubley run an algorithm if it
+needs to be run again on the same map.  i.e. if you enter ad+tr+k14 ad+tr+k3
+the (ad+tr) tour and time will be saved so it doesn't have to be run twice
+to apply "k14" and "k3" to the same tour.
+

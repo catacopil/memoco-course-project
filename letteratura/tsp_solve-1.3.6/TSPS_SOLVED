@@ -1,0 +1,113 @@
+Problems from TSPLIB-1.2
+
+++++Run on 66mhz pc with SCO unix
+
+cat gr24.* | tsp_solve -- b
+-s766952368 -m-4 b
+ Improved 1-Tree      1 runs = 00:00:00.18 for 1272.000000
+Completed
+
+cat bays29.* | /tsp_solve -- b
+-s766951983 -m-4 b
+ Improved 1-Tree      1 runs = 00:00:00.96 for 2020.000000
+Completed
+
+cat bayg29.* | tsp_solve -- b
+-s766951990 -m-4 b
+ Improved 1-Tree      1 runs = 00:00:00.74 for 1610.000000
+Completed
+
+cat gr48.* | tsp_solve -- b -v2
+-s766952420 -m-4 -v2 b
+ Improved 1-Tree      1 runs = 00:01:20.88 for 5046.000000
+Completed
+
+cat pr76.* | tsp_solve -- b -v2 -o108159.1
+-s766954619 -m-4 -o108159.100000 -v2 b
+ Improved 1-Tree      1 runs = 12:00:37.72 for 108159.000000
+Completed
+
+cat gr96.* | tsp_solve -- b -v2
+-s766952760 -m-4 -o55209.100000 -v2 b
+ Improved 1-Tree      1 runs = 00:23:50.67 for 55209.000000
+Completed
+
+cat ch130e.* | tsp_solve -- b -v2 -o6111.1
+ Improved 1-Tree      1 runs = 04:30:11.43 for 6110.000000
+Completed
+
+cat kroE100.tsp | TSP -o22068.1 -v2 b --
+-s767316343 -m-4 -o22068.100000 -v2 b
+ Improved 1-Tree      1 runs = 03:02:16.18 for 22068.000000
+Completed
+
+cat ch170.* | tsp_solve -- -v2 b -s170
+-s170 -m-4 -v2 b
+ Improved 1-Tree      1 runs = 1 Day 08:26:01.67 for 9395.549286
+Completed
+
+tsp_solve i -dEUC_2D -m-4 -v2 < rat99.tsp
+i              1 run  00:02:35.59 for 1211.000000
+Completed
+
+++++Run on Sparc 10
+
+cat eil101.* | tsp_solve -- b
+-s766606331 -m-4 b
+ Improved 1-tree      1 runs = 00:57:39.03 for 629.000000
+Completed
+ 
+cat eil101.* | tsp_solve -- b
+-s766611520 -m-4 b
+ Improved 1-tree      1 runs = 00:02:15.35 for 426.000000
+Completed
+ 
+cat eil76.* | tsp_solve -- b
+-s766611764 -m-4 b
+ Improved 1-tree      1 runs = 00:02:50.53 for 538.000000
+Completed
+ 
+cat kroA100.* | tsp_solve -- b
+-s766612237 -m-4 b
+ Improved 1-tree      1 runs = 00:18:17.93 for 21282.000000
+Completed
+
+cat kroB100.* | tsp_solve -- b
+-s766615275 -m-4 b
+ Improved 1-tree      1 runs = 00:41:39.37 for 22141.000000
+Completed
+ 
+cat kroC100.* | tsp_solve -- b
+-s766618476 -m-4 b
+ Improved 1-tree      1 runs = 00:15:10.64 for 20749.000000
+Completed
+ 
+cat kroD100.* | tsp_solve -- b
+-s766619557 -m-4 b
+ Improved 1-tree      1 runs = 00:02:30.72 for 21294.000000
+Completed
+ 
+cat kroE100.* | tsp_solve -- b
+-s766636595 -m-4 b
+ Improved 1-tree      1 runs = 05:12:21.72 for 22068.000000
+Completed
+
+cat lin105.* | tsp_solve -- b
+-s766812449 -m-4 b
+ Improved 1-Tree      1 runs = 00:00:12.25 for 14379.000000
+Completed
+
+cat rd100.* | sp_solve -- b -v2
+-s766899317 -m-4 -v2 b
+ Improved 1-Tree      1 runs = 00:01:13.51 for 7910.000000
+Completed
+
+cat st70.* | tsp_solve -- b -v2
+-s766900093 -m-4 -v2 b
+ Improved 1-Tree      1 runs = 00:02:12.86 for 675.000000
+Completed
+
+cat gr120.* | tsp_solve -- b -o6942.1 -v2
+-s766989458 -m-4 -o6942.100000 -v2 b
+ Improved 1-Tree      1 runs = 00:14:12.44 for 6942.000000
+Completed

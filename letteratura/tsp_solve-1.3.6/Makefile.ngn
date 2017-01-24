@@ -1,0 +1,84 @@
+#----------------------------------------------------------------------------#
+#                             Makefile.ngn                                   #
+# Dependencies For users with non-gnu-make which does not accept `.cc.o:'    #
+#----------------------------------------------------------------------------#
+
+COMPILE = $(CXX) $(BASECFLAGS) $(INCLUDES) $(CFLAGS)
+addition.o: addition.cc
+	$(COMPILE) -c addition.cc -o addition.o
+onetquel.o: onetquel.cc
+	$(COMPILE) -c onetquel.cc -o onetquel.o
+pqueue.o: pqueue.cc
+	$(COMPILE) -c pqueue.cc -o pqueue.o
+threeopt.o: threeopt.cc
+	$(COMPILE) -c threeopt.cc -o threeopt.o
+flexmap.o: flexmap.cc
+	$(COMPILE) -c flexmap.cc -o flexmap.o
+onetree.o: onetree.cc
+	$(COMPILE) -c onetree.cc -o onetree.o
+smatrix.o: smatrix.cc
+	$(COMPILE) -c smatrix.cc -o smatrix.o
+tour.o: tour.cc
+	$(COMPILE) -c tour.cc -o tour.o
+choice.o: choice.cc
+	$(COMPILE) -c choice.cc -o choice.o
+hungaria.o: hungaria.cc
+	$(COMPILE) -c hungaria.cc -o hungaria.o
+onetreeq.o: onetreeq.cc
+	$(COMPILE) -c onetreeq.cc -o onetreeq.o
+solver.o: solver.cc
+	$(COMPILE) -c solver.cc -o solver.o
+tourfind.o: tourfind.cc
+	$(COMPILE) -c tourfind.cc -o tourfind.o
+circlist.o: circlist.cc
+	$(COMPILE) -c circlist.cc -o circlist.o
+main.o: main.cc
+	$(COMPILE) -c main.cc -o main.o
+multfrag.o: multfrag.cc
+	$(COMPILE) -c multfrag.cc -o multfrag.o
+onetsolv.o: onetsolv.cc
+	$(COMPILE) -c onetsolv.cc -o onetsolv.o
+standard.o: standard.cc
+	$(COMPILE) -c standard.cc -o standard.o
+disperse.o: disperse.cc
+	$(COMPILE) -c disperse.cc -o disperse.o
+matrix.o: matrix.cc
+	$(COMPILE) -c matrix.cc -o matrix.o
+params.o: params.cc
+	$(COMPILE) -c params.cc -o params.o
+stanquel.o: stanquel.cc
+	$(COMPILE) -c stanquel.cc -o stanquel.o
+easytour.o: easytour.cc
+	$(COMPILE) -c easytour.cc -o easytour.o
+onetcity.o: onetcity.cc
+	$(COMPILE) -c onetcity.cc -o onetcity.o
+pquelem.o: pquelem.cc
+	$(COMPILE) -c pquelem.cc -o pquelem.o
+binfile.o: binfile.cc
+	$(COMPILE) -c binfile.cc -o binfile.o
+io.o: io.cc
+	$(COMPILE) -c io.cc -o io.o
+nopt.o: nopt.cc
+	$(COMPILE) -c nopt.cc -o nopt.o
+assign.o: assign.cc
+	$(COMPILE) -c assign.cc -o assign.o
+assignql.o: assignql.cc
+	$(COMPILE) -c assignql.cc -o assignql.o
+ants.o: ants.cc
+	$(COMPILE) -c ants.cc -o ants.o
+antheur.o: antheur.cc
+	$(COMPILE) -c antheur.cc -o antheur.o
+lib/smartnew.o: lib/smartnew.cc
+	$(COMPILE) -c lib/smartnew.cc -o lib/smartnew.o
+runer.o: runer.cc
+	$(COMPILE) -c runer.cc -o runer.o
+parallel.o: parallel.cc
+	$(COMPILE) -c parallel.cc -o parallel.o
+savings.o: savings.cc
+	$(COMPILE) -c savings.cc -o savings.o
+oneaborq.o: oneaborq.cc
+	$(COMPILE) -c oneaborq.cc -o oneaborq.o
+oneabor.o: oneabor.cc
+	$(COMPILE) -c oneabor.cc -o oneabor.o
+oneacity.o: oneacity.cc
+	$(COMPILE) -c oneacity.cc -o oneacity.o

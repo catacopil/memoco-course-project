@@ -1,0 +1,16 @@
+(2) Making a restorable runner class that triggers algorithms and
+remembers which were run and doesn't doubley run an algorithm if it
+needs to be run again on the same map.  i.e. if you enter ad+tr+k14 ad+tr+k3
+the (ad+tr) tour and time will be saved so it doesn't have to be run twice.
+
+--
+
+(2) I've got the runner class, but i need to figure a way to store and keep
+	track of tours already found, i think i can init the data structure by the
+   inited tour finders, so i know which ones will need to be run more than
+   once.  then once i have those, i make a data structure that will mark and
+   have pointers to the tours already run, and some how edit the tour finder
+   names (maybe replace the plus sign with a to mark where i need to start
+   using the "different" tour improvement procedures on the tour already
+   found.
+

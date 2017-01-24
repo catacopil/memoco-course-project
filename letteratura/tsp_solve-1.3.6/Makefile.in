@@ -1,0 +1,202 @@
+#----------------------------------------------------------------------------#
+#                             Tsp_Solve Makefile                             #
+#----------------------------------------------------------------------------#
+
+SHELL = /bin/sh
+CC = @CC@
+CXX = @CXX@
+RANLIB = @RANLIB@
+DEFS = @DEFS@
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+AR = ar
+RM = rm -f
+prefix = /usr/local
+exec_prefix = ${prefix}
+
+CFLAGS = -g -DMDEBUG # uses garbage collection mallocs
+LIB = libch.a
+LIBS = $(LIB) @LIBS@ -lm
+BASECFLAGS = -Wall
+
+BASEOBJS = runer.o findtour.o tour.o matrix.o tourfind.o params.o circlist.o\
+	io.o binfile.o $(LIB) parallel.o easytour.o
+HEURISTICOBJS = addition.o disperse.o loss.o multfrag.o\
+	nopt.o savings.o flexmap.o
+SOLVEROBJS = oneabor.o oneaborq.o oneacity.o\
+	solver.o standard.o stanquel.o pqueue.o pquelem.o\
+	onetquel.o onetsolv.o smatrix.o onetree.o onetreeq.o onetcity.o\
+	assignql.o assign.o hungaria.o
+OBJS = choice.o $(SOLVEROBJS) $(BASEOBJS) $(HEURISTICOBJS) main.o
+TESTOBJS = choice.o $(BASEOBJS) c.o
+MALOBJS = maltest.o
+HOBJS = choice0.o $(BASEOBJS) disperse.o addition.o nopt.o hungaria.o\
+	flexmap.o pqueue.o pquelem.o solver.o assignql.o assign.o
+CLEAN_FILES = *.o *.out tsp_solve ts tst mtest core *.a
+DISTCLEAN_FILES = heur shapes FILE tspinfo.txt stat*.tsp \
+	tspbak.txt config.status config.cache config.log config.h Makefile *.bak
+TSP_SOLVE_VERSION = tsp_solve-1.3.6
+
+tsp_solve:
+re: dust tsp_solve
+all: tsp_solve misc
+misc: shapes mtest
+conf:
+	cd config; make install clean
+
+#^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^ Stand Alone Progs
+shapes: shapes.o $(LIB)
+	$(CXX) $(CFLAGS) shapes.o $(LIBS) $(LDFLAGS) -o $@
+
+#^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^ Tsp_Solve
+tsp_solve: $(OBJS) $(LIB)
+	$(CXX) $(CFLAGS) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
+tst: $(TESTOBJS) $(LIB)
+	$(CXX) $(CFLAGS) $(TESTOBJS) $(LIBS) $(LDFLAGS) -o $@
+contest: $(HOBJS) $(LIB) heuristc.o
+	$(CXX) $(CFLAGS) $(HOBJS) heuristc.o $(LIBS) $(LDFLAGS) -o $@
+heur: $(HOBJS) $(LIB) main.o
+	$(CXX) $(CFLAGS) $(HOBJS) main.o $(LIBS) $(LDFLAGS) -o $@
+mtest: $(MALOBJS) $(LIB)
+	$(CXX) $(CFLAGS) $(MALOBJS) $(LIBS) $(LDFLAGS) -o $@
+
+FORCE:
+
+dep: FORCE
+	mkdepend -- $(CFLAGS) -- *c
+	mkdepend -fMakefile.in -- $(CFLAGS) -- *c
+
+clean: FORCE
+	- $(RM) $(CLEAN_FILES)
+
+distclean: clean
+	- $(RM) $(DISTCLEAN_FILES)
+	cd config ; make clean
+
+#^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^ Pack Distribution
+# Needs GNU Make foreach variable and Needs GNU tar
+dist: FORCE
+	cd .. ; $(prefix)/bin/tar --gzip --create --file=tsp.tgz \
+	$(foreach i, $(CLEAN_FILES) $(DISTCLEAN_FILES), \
+	--exclude="$(TSP_SOLVE_VERSION)/$(i)") $(TSP_SOLVE_VERSION)
+
+install: tsp_solve tsp_solve.info tsp_solve.man
+	${INSTALL} tsp_solve
+	${INSTALL_DATA} tsp_solve.man ${prefix}/man/man1/tsp_solve.man
+	${INSTALL_DATA} tsp_solve.info ${prefix}/info/tsp_solve.info
+
+TSPOBJS = challoc.o chnew.o chlib.o
+
+libch.a: $(TSPOBJS)
+	- $(RM) $@
+	$(AR) cq $@ $(TSPOBJS)
+	- $(RANLIB) $@
+
+info: tsp_solve.info
+
+tsp_solve.info: tsp_solve.tex texinfo.tex
+	makeinfo tsp_solve.tex
+
+#^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^'^`^ Encompassing Dependencies
+.SUFFIXES: .o .c .cc .h
+.cc.o:
+	$(CXX) $(BASECFLAGS) $(CFLAGS) -c $*.cc -o $*.o
+.c.o:
+	$(CC) $(BASECFLAGS) $(CFLAGS) -c $*.c -o $*.o
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+addition.o: addition.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+addition.o: binfile.h circlist.h params.h
+assign.o: stdmacro.h config.h tour.h matrix.h chlib.h binfile.h circlist.h
+assign.o: pqueue.h pquelem.h io.h parallel.h findtour.h tourfind.h params.h
+assign.o: assign.h solver.h assignql.h
+assignql.o: assignql.h stdmacro.h config.h pqueue.h pquelem.h io.h chlib.h
+assignql.o: binfile.h matrix.h assign.h solver.h tourfind.h tour.h circlist.h
+assignql.o: params.h
+binfile.o: binfile.h config.h io.h chlib.h stdmacro.h
+chlib.o: config.h chlib.h challoc.h stdmacro.h
+chnew.o: challoc.h
+choice.o: choice.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+choice.o: binfile.h circlist.h params.h findtour.h standard.h solver.h
+choice.o: pqueue.h pquelem.h io.h stanquel.h onetsolv.h smatrix.h onetree.h
+choice.o: oneabor.h addition.h easytour.h disperse.h nopt.h assign.h
+choice.o: multfrag.h loss.h hungaria.h savings.h flexmap.h
+choice0.o: disperse.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+choice0.o: binfile.h circlist.h params.h assign.h solver.h pqueue.h pquelem.h
+choice0.o: io.h nopt.h findtour.h easytour.h hungaria.h flexmap.h addition.h
+choice0.o: choice.h
+circlist.o: circlist.h stdmacro.h config.h
+disperse.o: disperse.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+disperse.o: binfile.h circlist.h params.h chnew.h findtour.h
+easytour.o: easytour.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+easytour.o: binfile.h circlist.h params.h chnew.h rand.h
+findtour.o: choice.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+findtour.o: binfile.h circlist.h params.h findtour.h io.h chnew.h easytour.h
+findtour.o: runer.h parallel.h rand.h
+flexmap.o: chlib.h flexmap.h tourfind.h tour.h matrix.h stdmacro.h config.h
+flexmap.o: binfile.h circlist.h params.h chnew.h rand.h
+heuristc.o: matrix.h stdmacro.h config.h chlib.h binfile.h params.h chnew.h
+heuristc.o: findtour.h tour.h circlist.h tourfind.h
+hungaria.o: hungaria.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+hungaria.o: binfile.h circlist.h params.h chnew.h findtour.h
+io.o: io.h config.h chlib.h chnew.h
+loss.o: loss.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+loss.o: binfile.h circlist.h params.h smatrix.h chnew.h
+main.o: matrix.h stdmacro.h config.h chlib.h binfile.h standard.h solver.h
+main.o: tourfind.h tour.h circlist.h params.h pqueue.h pquelem.h io.h
+main.o: stanquel.h onetsolv.h smatrix.h runer.h chnew.h parallel.h
+maltest.o: config.h challoc.h rand.h
+matrix.o: matrix.h stdmacro.h config.h chlib.h binfile.h params.h rand.h
+multfrag.o: multfrag.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+multfrag.o: binfile.h circlist.h params.h pqueue.h pquelem.h io.h smatrix.h
+multfrag.o: chnew.h
+nopt.o: nopt.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+nopt.o: binfile.h circlist.h params.h findtour.h rand.h
+oneabor.o: stdmacro.h config.h oneabor.h solver.h tourfind.h tour.h matrix.h
+oneabor.o: chlib.h binfile.h circlist.h params.h pqueue.h pquelem.h io.h
+oneabor.o: oneaborq.h oneacity.h findtour.h parallel.h
+oneaborq.o: findtour.h stdmacro.h config.h tour.h matrix.h chlib.h binfile.h
+oneaborq.o: circlist.h tourfind.h params.h disperse.h io.h oneaborq.h
+oneaborq.o: pquelem.h pqueue.h oneabor.h solver.h oneacity.h rand.h
+oneacity.o: oneacity.h stdmacro.h config.h binfile.h tour.h matrix.h chlib.h
+oneacity.o: circlist.h oneabor.h solver.h tourfind.h params.h pqueue.h
+oneacity.o: pquelem.h io.h
+onetcity.o: onetcity.h stdmacro.h config.h smatrix.h matrix.h chlib.h
+onetcity.o: binfile.h tour.h circlist.h
+onetquel.o: onetquel.h stdmacro.h config.h pquelem.h io.h chlib.h binfile.h
+onetquel.o: matrix.h smatrix.h tour.h circlist.h params.h pqueue.h onetsolv.h
+onetquel.o: solver.h tourfind.h
+onetree.o: stdmacro.h config.h onetree.h solver.h tourfind.h tour.h matrix.h
+onetree.o: chlib.h binfile.h circlist.h params.h pqueue.h pquelem.h io.h
+onetree.o: smatrix.h onetreeq.h onetcity.h findtour.h parallel.h
+onetreeq.o: findtour.h stdmacro.h config.h tour.h matrix.h chlib.h binfile.h
+onetreeq.o: circlist.h tourfind.h params.h disperse.h onetreeq.h pquelem.h
+onetreeq.o: io.h smatrix.h pqueue.h onetcity.h onetree.h solver.h
+onetsolv.o: stdmacro.h config.h onetsolv.h solver.h tourfind.h tour.h
+onetsolv.o: matrix.h chlib.h binfile.h circlist.h params.h pqueue.h pquelem.h
+onetsolv.o: io.h smatrix.h findtour.h parallel.h onetquel.h
+parallel.o: parallel.h io.h config.h chlib.h circlist.h stdmacro.h tour.h
+parallel.o: matrix.h binfile.h params.h
+params.o: io.h config.h chlib.h params.h stdmacro.h binfile.h parallel.h
+params.o: circlist.h tour.h matrix.h rand.h
+pquelem.o: chnew.h pquelem.h stdmacro.h config.h io.h chlib.h binfile.h
+pqueue.o: io.h config.h chlib.h pqueue.h stdmacro.h pquelem.h binfile.h
+pqueue.o: params.h
+runer.o: runer.h stdmacro.h config.h matrix.h chlib.h binfile.h tourfind.h
+runer.o: tour.h circlist.h params.h findtour.h parallel.h io.h
+savings.o: savings.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+savings.o: binfile.h circlist.h params.h chnew.h smatrix.h
+shapes.o: config.h rand.h
+smatrix.o: smatrix.h stdmacro.h config.h matrix.h chlib.h binfile.h
+solver.o: solver.h tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h
+solver.o: binfile.h circlist.h params.h pqueue.h pquelem.h io.h parallel.h
+standard.o: stdmacro.h config.h standard.h solver.h tourfind.h tour.h
+standard.o: matrix.h chlib.h binfile.h circlist.h params.h pqueue.h pquelem.h
+standard.o: io.h stanquel.h findtour.h
+stanquel.o: stanquel.h stdmacro.h config.h pquelem.h io.h chlib.h binfile.h
+stanquel.o: matrix.h
+tour.o: tour.h matrix.h stdmacro.h config.h chlib.h binfile.h circlist.h
+tour.o: smatrix.h
+tourfind.o: tourfind.h tour.h matrix.h stdmacro.h config.h chlib.h binfile.h
+tourfind.o: circlist.h params.h parallel.h io.h runer.h

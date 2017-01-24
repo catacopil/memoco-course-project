@@ -1,0 +1,108 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT
+AC_CONFIG_HEADER(config.h)
+AC_PROG_RANLIB
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CXXCPP
+AC_CHECK_FUNC(ftime, AC_DEFINE(HAS_FTIME))
+AC_CHECK_FUNC(clock, AC_DEFINE(HAS_CLOCK))
+AC_CHECK_FUNC(aint, AC_DEFINE(HAS_AINT))
+AC_CHECK_FUNC(signal, AC_DEFINE(HAS_SIGNAL))
+AC_CHECK_FUNC(lrand48, AC_CHECK_FUNC(srand48, AC_DEFINE(HAS_RAND48)))
+AC_CHECK_LIB(socket, gethostname)
+dnl
+AC_CHECK_FUNC(unlink, AC_DEFINE(HAS_UNLINK))
+AC_LANG_CPLUSPLUS
+AC_MSG_CHECKING([checking for file locking with O_EXCL])
+AC_CACHE_VAL(ac_cv_o_excl,
+AC_EGREP_CPP(yes,
+[#include <fcntl.h>
+#ifdef O_EXCL
+yes
+#endif
+], ac_cv_o_excl=yes, ac_cv_o_excl=no)
+)
+AC_MSG_RESULT($ac_cv_o_excl)
+AC_MSG_CHECKING(for remote shell program)
+AC_CACHE_VAL(ac_cv_remote_command_shell,
+[ac_cv_remote_command_shell=rsh
+for ac_dir in /usr/bin /usr/ucb /usr/bsd; do
+   for ac_prog in rcmd rsh remsh nsh; do
+      if test -f $ac_dir/$ac_prog; then
+         ac_cv_remote_command_shell="${ac_dir}/${ac_prog}"
+         break 2
+      fi
+   done
+done
+]
+)
+AC_MSG_RESULT($ac_cv_remote_command_shell)
+if test "$ac_cv_o_excl" = yes && test "$ac_cv_func_unlink" = yes; then
+   if test "$ac_cv_remote_command_shell" != rsh; then
+      AC_DEFINE(HAS_NFSLOCK)
+      AC_DEFINE_UNQUOTED(REMOTE_COMMAND_SHELL, "$ac_cv_remote_command_shell")
+   fi
+fi
+AC_TYPE_SIGNAL
+dnl #ifdef __cplusplus
+dnl extern "C" void (*signal (int, void (*)(int)))(int);
+dnl #else
+dnl void (*signal ())();
+dnl #endif
+AC_C_BIGENDIAN
+AC_CHECK_HEADERS(unistd.h)
+AC_MSG_CHECKING([for maximum rand() return value])
+AC_CACHE_VAL(ac_cv_max_rand,
+if test "$ac_cv_func_srand48" = yes && test "$ac_cv_func_lrand48" = yes; then
+	ac_cv_max_rand=0xffffffff
+else
+AC_TRY_RUN(
+[#include <math.h>
+#include <stdlib.h>
+main ()
+{
+   unsigned long x,r;
+   for(x=0; x<100; x++) {
+      r=rand();
+      if (r > 32768)
+         exit(1);
+   }
+   exit(0);
+}], ac_cv_max_rand=0x7fff, ac_cv_max_rand=0x7fffffff, ac_cv_max_rand=0x7fffffff)
+fi
+)
+AC_DEFINE_UNQUOTED(MAX_RAND, $ac_cv_max_rand)
+AC_MSG_RESULT($ac_cv_max_rand)
+dnl
+dnl searches for function prototype existance in a header file
+dnl
+define(AC_CHECK_HEADER_DECL,
+AC_MSG_CHECKING(for $1 function declaration in $2)
+AC_CACHE_VAL(ac_cv_$1_header_decl,
+   AC_EGREP_HEADER([[[[[	* ]]]]]$1.*(.*), $2,
+      eval "ac_cv_$1_header_decl=yes", eval "ac_cv_$1_header_decl=no")
+)
+if test "${ac_cv_$1_header_decl}" = yes; then
+   $3
+fi
+AC_MSG_RESULT(${ac_cv_$1_header_decl})
+)
+dnl
+AC_CHECK_HEADER_DECL(unlink, unistd.h, AC_DEFINE(HAS_UNLINK_DECL))
+AC_CHECK_HEADER_DECL(gethostname, unistd.h, AC_DEFINE(HAS_GETHOSTNAME_DECL))
+AC_CHECK_HEADER_DECL(sprintf, stdio.h, AC_DEFINE(HAS_SPRINTF_DECL))
+AC_CHECK_HEADER_DECL(ftime, sys/timeb.h, AC_DEFINE(HAS_FTIME_DECL))
+AC_CHECK_HEADER_DECL(clock, time.h, AC_DEFINE(HAS_CLOCK_DECL))
+AC_CHECK_HEADER_DECL(lrand, stdlib.h, AC_DEFINE(HAS_LRAND48_DECL))
+AC_CHECK_HEADER_DECL(srand, stdlib.h, AC_DEFINE(HAS_SRAND48_DECL))
+AC_CHECK_HEADER_DECL(rand, stdlib.h, AC_DEFINE(HAS_RAND_DECL),
+AC_CHECK_HEADER_DECL(rand, math.h, AC_DEFINE(HAS_RAND_DECL))
+)
+AC_CHECK_HEADER_DECL(srand, stdlib.h, AC_DEFINE(HAS_SRAND_DECL),
+AC_CHECK_HEADER_DECL(srand, math.h, AC_DEFINE(HAS_SRAND_DECL))
+)
+AC_CHECK_HEADER_DECL(time, time.h, AC_DEFINE(HAS_TIME_DECL))
+AC_CHECK_HEADER_DECL(sleep, unistd.h, AC_DEFINE(HAS_SLEEP_DECL))
+AC_CHECK_HEADER_DECL(close, unistd.h, AC_DEFINE(HAS_CLOSE_DECL))
+AC_OUTPUT(Makefile)

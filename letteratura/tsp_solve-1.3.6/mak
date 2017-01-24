@@ -1,0 +1,16 @@
+#!/bin/sh
+if test ! -f config.h || test ! -f Makefile; then
+   ./configure
+fi
+#make "CFLAGS=-O3 -g" $*
+#make "CFLAGS=-O3 -DNDEBUG" $*
+#make "CFLAGS=-O3 -DMDEBUG -g" $*
+#make "CFLAGS=-O3 -DNDEBUG -s" $*
+make "CFLAGS=-O3 -s" $*
+#make $*
+#make "CFLAGS=-O3 -DMDEBUG" $*
+#make "CFLAGS=-O3 -DMDEBUG -pg" $*
+#make "CFLAGS=-O3" $*
+#make "CFLAGS=-O3 -DNDEBUG -p" $*
+#make "CFLAGS=-O3 -g -p" $*
+#make "CFLAGS=-g" $*

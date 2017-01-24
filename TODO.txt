@@ -1,0 +1,15 @@
+
+TODO:
+	- misurazione tempo di esecuzione per risolutore CPLEX
+	- creazione di istanze multiple, e far girare il programma su più istanze diverse della stessa misura
+	- implementazione di un'euristica per risolvere il TSP (con misurazione tempo e tutto)
+	- confronto dei risultati (se possibile nello stesso eseguibile)
+	- approffondimento con eventuali altre euristiche e confronti
+	- RELAZIONE (descrizione del codice, parlare dei risultati ottenuti, schemi, eventuali grafi istanze, )
+	
+
+OPTIONAL:
+	- creazione di istanze (con framework?) che rispettino certi "vincoli" o "pattern" (ispirandosi alla realtà)
+	- illustrazione grafica delle istanze 
+	- conclusioni aggiuntive in base ai risultati ottenuti con vari tipi di istanze
+	- codice commentato e Object Oriented

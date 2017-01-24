@@ -1,0 +1,161 @@
+
+OneTree Design Notes:
+Aboresence Design Notes Below:
+
+since the new branching will be able to require and deny edges arbitrarily
+a new mic_list must be constructed that will be suitable to leave certain
+multiple cities on the traveled path while still included in the onetree
+possibilitye.  What this comes down to is enabling multiple partial tours
+in the relaxation, while the relaxation is computed around the partial
+tours.  While the previous ontree branching method relied completely
+that the branching was simply moving one city down the branch tree,
+and assuming when you move you add that city to the required (singluar
+tour.)
+
+I figure it will be most fruit-full if the mic_list arry has three parts
+(still not in city order.)
+
+The first part containing all cities that have
+required edges on both sides of them.  These cities will never be considered
+for the current subproblem so they get their own area, but they need to
+at least store one city that it has an included edge to, i plan on
+storing two because the tour builder at the end shouldn't have to
+assume it will build the tour one way.
+
+The third part will be cities that have no required edges on them.  These
+are very similar to the one tree cities of the previous branching method.
+They are alwasy considered for the onetree calculation.  To solve a
+completley new onetree these will be the first set of cities it will
+search through for the minimum spanning three calculation.
+
+The second section of cities, will be those that have exactally one
+required edge in the subproblem.  These cities are different because
+they may or may not be "included in the oneetree spanning calculation
+at a given time.  These cities will always come in pairs and they will
+also be the ends of any given partial tour that may arise in the sub-problem.
+Their required neighbor may be in the first or second section but either
+way they will always have a "end" twin that will correspond to the other
+end of the partial tour the city is in.
+
+the second and third sections may have cities one the current one tree
+or because of cuts made because of requirements or denials have cities
+that are not in the one tree.  It is the relaxation's job to make sure
+all the cities in the sections are i the one tree.
+
+The operations on the city sections (when we assume all the cities are
+included in the onetree) will be deny(edge(i,j)) require(ege(i,j))
+
+Denial of an edge will assert that the edge is in the onetree, and then
+attempt to cut off the edge between the two cities the edge joins,
+it can also deny the edge from the sorted matrix so it is not included
+in any other future sub problems.  The deny procedure will then try
+to re-connect the onetree with the edges it can.  It need only connect
+any city from one side of the cut to any other city on the other
+side of the cut.  A Labeling procedure is used to determine which cities
+are on what side.  Denying of an edge does not move cities into different
+sections.
+
+Requiring an Edge in a subproblem, could prove very difficult.  The first part
+of requiring an edge is first determining what are you doing to the onetree
+when you require the edge.  There are several differnt circumstances that
+edges can be required.  You cannot however require an edeg under the
+circumstance where either city of the edge you are required is in the
+first section of cities.  Then there can be four possiblitlies of
+requireing an edge, where either of the cities can be in the second or
+third sections.
+
+Fortunatley we will be working under situations where including an edge
+which will already be in the one tree.  If this is the case you check both
+of the cities for section 2 or 3.  If a city of the edge is in section three
+you move it to section 2, if it is in section 2 you move it to section
+one.  The onetree remains feasable for this operation, because you cut the
+edge that you include from the one tree and it is still a minimumsapning
+1-tree, if you use that edge to remain connectied.  However if the
+city edge is in section 2 and has more than one branches, you must
+cut the other edges from that city, and call a re-connecting-span procedure.
+that will notice the cuts and make patch edges to maintain a minimumspaning
+tree even though the edges were cut.
+
+--
+
+in the calculation in a onetree i just made a stunning discovery, the onetree
+is not necessarily a minimum spannign tree of n-1 edges plsu the two best
+edges of the nth city!  It is also a minimum spanning tree of the whole
+graph,  in addition to the highest second best edge of any of the cities with
+only one minimum spanning tree edge.  This is because a minimum spaning tree
+always contains the lowest costing edge coming from each city.  This makes
+the 1-tree universally more "simpler" in the code than the previous
+definition.
+
+i will call this special edge (in the code) that completes a minimum spaning
+tree into a one tree the "sacred_edge".
+
+--
+
+Debuging notes:
+
+i made a two discoveries that are casting somewhat of a shadow over getting
+some solid debuging done.
+
+(1) you can exaustively forbid a matrix to the point where a tour is not
+    possible.  This can be found when you are calculating the minimum spaning
+    tree and find no edges left to connect one tree to another.  This can
+    also be found calculating the sacred edge.  If all the edges are forbided
+    but one from any city, then that city disables the whole graph from making
+    a tsp tour.  When either of these cases is found i used to assert that
+    there is no edge to connect to and usually do some debuging, but now
+    for some cases this assertion doesn't need to stop the program, but
+    simply ignoe the subproblem it is working on and continue on others.
+
+(2) when generating new subproblems there are some cases where the cost of
+   the relaxation can decrease from the parent subproblem to the first.
+   One case so far is because of the arbitrary nature of the sacred edge.
+   Example: subproblem with a sacred_edge cost of 50.  If an edge is forbided
+   and cut from a subproblem who's cost is 100, and then a new min_span
+   edge is connected that is cost 105.  the new edge happens to be located
+   where the sacred edge was and there for makes the branches of the sacred_id
+   more than 1, discarding it from being a sacred_id choice again.
+   Unfortunatley there are no mathematical constraints that can restrict the
+   new sacred edge chosen from being less than (105-100) different from 50.
+   so you have a possibility of having a relaxation that is lower than that
+   of the origonal subproblem.
+
+(3) The proper relaxation must find the minimum sacred edge, but i have
+   empiricaly concluded that finding the maximum sacred edge is still a
+   relaxation.  I have found out that no matter if you find the mimimum or
+   the maximum your branches still have the possibility of becoming
+   LOWER than the parent branch which seems like a unsuitable atribute of a
+   relaxation but each one of these is verified. and since you can still
+   find a LOWER branch than it's parent with finding the minimum sacred
+   edge, it can't hurt to find the maximium, and it in fact helps by
+   providing higher bounds.
+
+These commented out assertions can be found in the code as /*NOTE:N*/, where
+N depends on the note number above.
+
+---
+
+Aboresence Design Notes:
+
+The arboresence is a hellish creature, essentially algorithmically equivalent
+to a minimum spanning tree but, cannot take advantage the assumptions the
+minimum spanning tree makes about it's nice undirected format.
+
+To find a minimum arboresence, you find all the minimum in costs to to each
+city.  This builds either a complete 1-arborescence or a series of
+disconnected sub-1-arborences each containing a cycle.  If more than one cycle
+occurs, there is a minimum cost operation to open that cycle up to be
+connected to the rest of the graph.
+
+Finding the minimum operation to "open" a cycle is recursively tricky.
+Trivally, if one of the next best costs is from a city not in the
+sub-arboresence comes to a city in the cycle of the arboresence, the minimum
+of such is a minimum operation candidate.  But, if the next best cost comes
+from a city in the 1-arboresnce, this makes the cycle bigger and you
+must then find the minimum operation to open up this cycle.  The bigger cycle
+only needs to check for operations on the newly added edges to the cycle.
+In addition you can skip any city that was previously in an
+sub-1-arborescence cycle from being a city to come from, since such an
+operation woule leave you with no new checks and it would still
+add to your operation cost.
+

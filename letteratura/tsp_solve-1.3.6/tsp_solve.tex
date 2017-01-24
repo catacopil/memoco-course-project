@@ -1,0 +1,673 @@
+\input texinfo.tex
+@c %**start of header
+@setfilename tsp_solve.info
+@settitle GNU tsp_solve
+@setchapternewpage odd
+@c %**end of header
+
+@iftex
+@finalout
+@end iftex
+
+@ifinfo
+This file documents the GNU tsp_solve program.
+
+Copyright (C) 1992 Free Software Foundation, Inc.
+Program and Manual authored by Chad Hurwitz.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the
+results, provided the printed document carries copying permission notice
+identical to this one except for the removal of this paragraph (this
+paragraph not being relevant to the printed manual).
+@end ignore
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+GNU Copyright statement is available to the distributee, and provided
+that the entire resulting derived work is distributed under the terms of
+a permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+@end ifinfo
+
+@titlepage
+@title GNU tsp_solve
+@subtitle Edition 1.3, for GNU tsp_solve version 1.4
+@subtitle September 1994
+@author by Chad Hurwitz
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 1990, 1991, 1992 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the Foundation.
+@end titlepage
+
+@node Top
+@top
+
+@ifinfo
+This document describes the GNU tsp_solve program, a utility for obtaining
+solutions to Traveling Salesperson Problems.
+
+@end ifinfo
+
+@menu
+* Introduction::       TSPs and tsp_solve
+* Using tsp_solve::    Arguments and Options of tsp_solve
+* Tour Finders::       Tour Finder algorithms
+* Tour Improvements::  Tour Improvement algorithms
+* Examples::           Examples of usage
+* Messages::           Error messages tsp_solve reports
+* Notes::              How to determine if tsp_solve is what you need
+* Bugs::               Caveats, Beetles
+* Contributors::       The hall of champions
+@end menu
+
+@node Introduction
+@chapter Introduction
+The Traveling Salesperson Problem (TSP) is one of the seminal NP complete
+problems that select mathematical fields become consumed over when they are
+possessed to solve.  A TSP decides how to travel N cities exactly once while
+minimizing the total cost it takes to travel between each city and returning
+to the starting city.  The problem may be specified by giving coordinates of
+the N cities, where the cost to travel each city is designated by the
+euclidean distance between each city's coordinate location.  The problem may
+also be specified by a matrix where each city has a row and column of costs
+from and to each city.  A solution of a TSP is the tour that the imaginary
+salesperson takes, i.e. an ordered permutation of the cities in the TSP.
+
+tsp_solve can take a TSP as input, find a solution, and output the solution.
+The solution found can be an optimal TSP solution or it can be a heuristic
+solution depending on what kind of tour (solution) finder is specified.
+
+@node Using tsp_solve
+@chapter Using tsp_solve
+
+@menu
+* Input Options::      Input options of tsp_solve
+* Output Options::     Output options of tsp_solve
+* Advanced Options::   Less intuitive options
+* Signal Responses::   What happens when a tsp_solve process is signaled
+@end menu
+
+@node Input Options
+@section Input options of tsp_solve
+
+TSPs can be input in one of three ways:
+
+@enumerate
+@item
+automatically randomly generated
+
+@item
+input by matrix
+
+@item
+input by 2-D coordinates
+@end enumerate
+
+In circumstances where the input file does not describe the size of the TSP,
+the number of cities must be specified on the command line as a positive
+integer N.  With no input options, tsp_solve will generate a set of 2-D cities
+and the cost matrix calculated by the euclidean distance between the city
+coordinates: defaulting to '-m1'.
+
+All numbers/values expected from user input can be separated by any character
+besides the '.', 'e', 'E', '+', '-', or digits 0 through 9.  Exponentials and
+negative values may be used as input.  Any alpha strings separated by
+white space (including characters '.', 'e', 'E', '+', '-') that do not contain
+digits will be ignored as separator space for the next value.
+
+@table @samp
+@item -m1
+Generate random 2-D coordinates.
+
+@item -m2
+Generate a random symmetric TSP.
+
+@item -m3
+Generate a random asymmetric TSP.
+
+@item -m4
+Generate a random asymmetric oneway TSP.  see `-m-3'.
+
+@item =
+@itemx -m-1
+Expect a list of N coordinate pairs from standard input.
+
+@item -
+@itemx -m0
+Expect a full matrix to be passed from standard input.
+
+@item -=
+@itemx -m-2
+Like the '=' option except expect an ordered list of integer city ids after the
+coordinate list to specify what order the matrix should be filled from the
+coordinates.  This is useful when the "easytour" tour finder is specified.  If
+you know the order of cities but you don't know the order of coordinates and/or
+you wish to find out the cost of that tour, cat the coordinate file with the
+ordered set of city ids appended into a pipe "tsp_solve -= easy" with whatever
+printing options needed.
+
+@item -m-3
+Expect a special one-way TSP as a series of numbers:  the number of cities (N),
+followed by N costs representing the starting city to all N cities, followed by
+N costs representing each of the N cities to the ending city, followed by an
+NxN matrix as expected for the '-' option.  Note: this creates a TSP of N+2
+cities where the starting city (N+1) is always traveled after the ending city
+(N+2).  It is assumed, by assigning very large costs to the edges, impossible to
+get from any N cities to the starting city and it is impossible to get from the
+ending city to any other city except the staring city.
+
+@item --
+@itemx -m-4
+Expect a .tsp file in TSPLIB format.  Since the number of cities is specified
+in the TSPLIB file the command line Ncities will be ignored.  Also, if a
+TOUR_SECTION which follows the TSPLIB file, the TSP matrix will be ordered by
+that matrix.  Appending the TOUR_SECTION to the TSPLIB file and using the
+"easytour" tour finder is a way to compute the "cost" of a TSPLIB solution
+and/or output the TSPLIB solution in gnuplot format.
+
+@itemx -m-5
+Expect a symmetric one-way TSP.  Like the -m-3 option but all the costs of the
+N cities should form a symmetric matrix.  The starting and ending (N+1 and N+2
+respectivley) cities must be traveled adjacently though not in any directed
+order.
+
+@itemx =.
+@itemx -m-6
+expect a set of coordinates as in `=', but followed by an extraneous coordinate
+Ef two numbers.  This option is most usefull when trying to read the `-p1'
+gnuplot output format, which needs the extra coordinate to complete the plot
+of the tour.
+
+@item -fX
+Transfer all expectations of input from standard input to the file 'X'.
+@end table
+
+Definitions: A TSP input by 2-D coordinates is called a Euclidean TSP.  A TSP
+input from a symmetric cost matrix is called a Symmetric TSP.  A TSP input
+with an asymmetric cost matrix is called an Asymmetric TSP.
+
+@node Output Options
+@section Output Options
+
+The first line of all output, except when -p1 is used, will output a replica
+of the command line used.  This is specifically useful for the -s option.
+Since if -s is not specified, the user will not know what seed was used.
+After all the tour finders are run, tsp_solve will always display the summary
+of the performance of all tour finders run, that shows the Tour Finder name,
+the number of tours found, and the total time used by the tour finder in
+milliseconds and the cost of the tour found (or the average and standard
+eviation of the tour costs found if more than one tour is found.)
+
+Other options are available for more tour output detail.
+
+@table @samp
+@item -p1
+Display the tour(s) found in gnuplot format.  The only output will be: (for each
+tour) a list of x y coordinate numbers of the cities followed by the first x y
+coordinate to complete the plot of the tour.  If a non-euclidean matrix is used
+then only the city id's of the tour are output.  The output of the tour is
+sent through stdout, all other output mentioned in all other options is sent
+through stderr.
+
+@item -p2
+Display a line for each tour finder each time it is run.  Each tour's output
+line will contain the tour finder's name, the cost of that tour and the time
+it took to find that tour.
+
+@item -p3
+Display the same as -p2 but include a ordered output of the citie of the tour.
+
+@item -p4
+Display each tour found in TSPLIB format; the reverse of the `---' option.
+@end table
+
+@node Advanced Options
+@section Advanced Options
+
+The parallelizing options -n and -r will not be fully functional until
+version 1.4.  However, the -r option when used alone will be able to
+restore files created by sending a SIGUSR1 signal to the tsp_solve process
+currently running the "imponetree" tour finder.
+
+@table @samp
+@item -nNFSDIR
+When -n is specified, tsp_solve goes into client mode and uses the NFSDIR to
+look for other clients currently running on the mounted directory.  This
+option will enable a single TSP to be solved in parallel using multiple
+machines that have a common mounted filesystem with directory NFSDIR.
+Currently, "imponetree" is the only tour finder capable of runing in parralel
+with other tsp_solve processes running.  To start a parallel algorithm,
+first run tsp_solve with all the options needed to solve the large TSP on
+one processor in addition to the -nNFSDIR option.  Then on any other machine
+that has the same mount of the directory specified when starting the run,
+invoke "tsp_solve -nNFSDIR" and it will attempt to split the currently
+running queue and start running on the split queue.  The main client or the
+tsp_solve client that was started first will report the best solution and
+terminate the remaining clients after all clients return with no queues left
+to explore.
+
+The following files are created when running the "imponetree" algorithm
+in parallel mode.  'X' in the [filename] will specify a numerical digit.
+Each TSP started in parallel mode, is given a session number that may be
+contained in the filenames.  [Xtour.tsp] (where X is the session number)
+is the best tour found stored in a binary format.  [HHX-X.tsp] (where
+two characters from the hostname are HH and the first X is the client id
+and the second X is the Xth file made from this client so far) is a info
+file passed with the -r option.  [tsphosts] is the host text file which
+keeps track of what is running and how.  The format contains numbers and
+character strings separated by spaces or tabs.  The first line is reserved
+for the number of clients.  The remaining lines are for the clients, one
+line per client.
+
+The following information is what is on each line for each client: Session Id,
+Client Id, Status bits, Process Id, USR1 Signal, USR2 Signal, tsp_solve
+parameters with whitespace replaced by '^', Full Pathname, Hostname.  Here is
+an example of a hosts file with one client running.
+
+@example
+1
+0  0   128 24331 16 17 crash.cts.com -rcr0-1.tsp^100^imp tsp_solve
+@end example
+
+A single '^' character string specifies the null string.  In this example
+the tsp_solve Full Pathname is blank. 
+
+@item -rINFOFILE
+The -r option is used to recover and continue a partial instance of a
+previously running problem from an INFOFILE saved from a previous tsp_solve
+process.
+
+If the tsp_solve process catches a SIGUSR1 signal and certain algorithms
+which have saving capability are running, the files state000.tsp and
+tspinfo.txt are written to the current directory which preserves the full
+state of the algorithm.  The -r option will continue the tour finder saved in
+this state.  The restorable .tsp file created by a SIGUSR1 is usually a
+megabyte, depending on the size of the core memory of the tsp_solve process
+and how large a TSP is being run.
+
+If the tsp_solve process catches a SIGUSR2 signal and certain algorithms
+which have spliting capability are running and the tsp_solve process was
+started with the -n option, a file is saved in the [HHX-X.tsp] format above.
+This too can be restorable but it will only be a portion of "work" the previous
+tsp_solve process has now ignored to do since it was asked to split and save
+the partial "work" in the file.
+
+@item -iN
+Sets the initial choice of some algorithms to start with city N.  However, most
+algorithms don't have a selectable starting city.  The default value is 0.
+
+@item -oN
+Sets the upper bound for branch and bound algorithms.  Usually the branch and
+bound algorithm, will find it's own upper bound and use that, however if you
+know ahead of time that there exists a tour that has a cost of C, that is a
+better tour than a heuristic can give, then setting -o(C+1) will make the
+branch and bound go a bit faster.  Note: if you call -o with a value that is
+less than or equal to the cost of the best possible tour for the TSP, a branch
+and bound algorithm will fail and not find a tour.  If -o is entered with out
+the N argument, the upper bound is set to the cost of the in order tour.  If
+the N argument is left out or is zero, the default upper bound is set to the
+cost of the best heuristic tour.
+
+@item -pN
+This option determines what the printed tour output format of tsp_solve will
+be.  See OUTPUT OPTIONS.  The default is 0.
+
+@item -mN
+This option determines what input format tsp_solve will expect.
+See Input Options.  The default is 1.
+
+@item -sN
+Sets the initial seed value for generating random TSP matrices.  This option is
+useful for invoking tsp_solve twice on the "same" randomly generated matrix.
+The default seed is the return value of time(1) called before any algorithm is
+run by tsp_solve.
+
+@item -tN
+Sets the number of times the algorithms are run on a new randomly generated
+matrix.  If -t2 -s0 is passed on the command line, tsp_solve runs the tour
+finders on a matrix generated with a seed of 0 and then runs the tour finders
+on a new matrix generated with a seed of 1.  If -t is used with user input
+TSPs, tsp_solve will expect data for N matrices to be passed through standard
+input.  The default is 1.
+
+@item -xN
+Sets an Extra value, reserved for passing additional information to developing
+tour finders.
+
+@item -vN Sets the verbosity level.  Useful for debugging tour finders.  The
+default is 0 and shows no extraneous information.
+
+@item -dX
+Override the default distance function for Euclidean TSPs.  The possible
+values of "X" are "EUC_2D", "EST_2D", "GEO", "ATT", and "HOTO".  They each
+represent a function that can be calculated from two coordinate sets that
+result in a type of distance returned.  The default distance is "EST_2D"
+which is a strict un-rounded pythagarean distance between two points.  The
+other distance function are explained in the TSPLIB distribution.  If the
+`---' option is used with this option, the X replaces the value of
+'EDGE_WEIGHT_TYPE' in the .tsp file input.
+@end table
+
+@node Signal Responses
+@section Signal Responses
+Certain signals, when sent via kill(1), to tsp_solve, will interrupt or
+spawn new things to happen with what tsp_solve is currently doing.  Most
+signals are defined using signal(1) definitions.  Please refer to the signal
+man page on your site to know the exact signal numerical values.
+
+@table @samp
+@item SIGUSR1
+A SIGUSR1 signal asks tsp_solve to save the information it is doing
+so it can be restored and continued when using the -rFILENAME option.  In
+version 1.4 only the "imponetree" tour finder may be saved and restored in
+this manner.
+
+@item SIGUSR2
+A SIGUSR2 signal asks the tsp_solve running to split its work because another
+tsp_solve might be waiting to do something.  If the process finds that there
+is another waiting client in the tsp hosts file, tsp_solve will save a
+restorable file and put a "todo" entry in the hosts file for the waiting
+client to pick it up.
+
+@item SIGTSTP
+If tsp_solve is interrupted with a SIGTSTP, care is taken to keep track of the
+time lost while suspended between calculating how long a tour finder takes to
+run.  If this signal is caught, it will print a tour summary of what tours were
+found so far, and then stop the current tour finders timer enabling the process
+to be truly suspended.  The SIGSTOP signal, since it cannot be caught in all
+platforms, will not perform the previous function but mearly stop the process
+leaving the tour finder timer running.
+
+@item SIGCONT
+If a SIGTSTP signal is caught and then a SIGCONT is caught while the tsp_solve
+process is suspended, the process is restarted on running the current tour
+finder (continuing the timer and the process.)  If the process was stopped by
+SIGSTOP, then SIGCONT mearly resumes the process.
+@end table
+
+
+@node Tour Finders
+@chapter Tour Finders
+
+Tour finders are specified on the command line by name.  Unique abbreviated
+prefix of the full names of tour finders may be used to specify tour finders
+if there is no other tour finder with the same abbreviated prefix; "on" may
+be used for "onetree" since there is no other tour finder that begins with
+"on."
+
+tsp_solve will execute each tour finder in the command line for each TSP
+input.  The output format of the tour finder is determined by the output
+options below.  Each tour finder will find and/or print it's solution after
+it is executed.  Some tour finders are restricted to finding solutions for
+only certain kinds of matrices.  The so far implemented tour finders are as
+follows.
+
+@example
+TourFinder   |  optimal? | Types of TSPs that work best
+-------------+-----------+-----------------------------------
+best         |    yes    | any
+imponetree   |    yes    | Symmetric
+onetree      |    yes    | Symmetric
+assign       |    yes    | Asymmetric
+standard     |    yes    | any (slowest)
+arborescence |    yes    | Almost Symmetric
+hungarian    |    yes    | any small
+heurbest     | heuristic | any
+addition     | heuristic | any
+farinsert    | heuristic | any
+easytour     | undeterm. | any (in order)
+random       | undeterm. | any (in random order)
+flexmap      | heuristic | large Euclidean
+disperse     | heuristic | Asymmetric, Non-Euclidean Symmetric
+multifrag    | heuristic | any
+antheur      | heuristic | any
+splitadd     | heuristic | any
+christofide  | heuristic | Symmetric
+patching     | heuristic | Assymetric
+psort        | heuristic | Assymetric
+loss         | heuristic | Assymetric
+@end example
+
+"best" will choose the fastest currently implemented optimal solution tour
+finder available, with respect to the type of TSP that has been input.
+"assign" is an Assignment Problem Relaxation optimal tour finder.  It is
+best for asymmetric TSPs.  "onetree" and "imponetree" are implementations
+of the Volgenant and Jonker (1981) paper that uses the 1-Tree Langrangean
+Relaxation.  "imponetree" does better for more random cities and uses
+the enhanced branching techniques, whereas "onetree" does better for
+pathelogical cases (grids, circles of cities) and does not use special
+branching.  "arborescence" solves asymmetric TSPs best when the cost
+from city i to city j is fairly close to the cost from city j to city i.
+The "arborescence" algorithm uses a simliar Lagrangian training mechanism
+to "imponetree".  It uses a relaxation algorithm modeled from the paper
+"An Efficient Algorithm for the Min-Sum Arborescence Problem on Complete
+Digraphs" by Matteo Fischetti and Paolo Toth, ORSA Journal on Computing,
+1993, p426-434.  "hungarian" is the Hungarian method for optimally solving
+TSPs and was implemented by Bob Craig.
+
+"heurbest" tries to guess from the matrix which heuristic will find the best
+possible heuristic solution with a minor reguard for speed.  "addition"
+is a nearest addition tour finder.  If a Euclidean TSP is input, then
+the addition heuristic will generate a convex hull as a initial tour.
+"farinsert" is an implementation of the Farthest Insertion algorithm and
+also generates a convex hull to start with if the problem is Euclidean.
+"easytour" will return a tour as the order of cities input to tsp_solve.
+"easytour" is a method of passing a user defined tour into tsp_solve so
+other improvement algorithms may improve upon the tour input.  "flexmap"
+does well for large Euclidean TSPs and is an implementation from the
+algorithm and paper by Bernd Fritzke and Peter Wilke, 1991 IJCNN-91
+Singapore.  "disperse" is an algorithm from an Academic Thesis "Traveling
+Salesperson Dispersion: Performance and Description of a Heuristic" by
+Chad Hurwitz, 1992.  "multifrag" is a heuristic based on the paper by Jon
+Louis Bentley.  The "multifrag" algorithm is a watered down version from
+the rigorus "mf" algorithm in the paper.  The "splitadd" heuristic is a
+hybrid between the farthest insertion and nearest addition algorithms, for
+the first 1/4 of the cities the algorithm chooses the farthest insertion,
+for the rest the nearest addition algorithm is used to choose which city
+to be inserted in the tour.  The "antheur" is heuristic that models
+many ants trying to find a better path collectively.  This approach
+is based on the paper: "The Ant System: An Autocatalytic Optimizing
+Process" authored by Marco Dorigo, Vittorio Maniezzo, Albero Colorngo,
+dorigo@@iprnel2.elet.polimi.it, maniezzo@@iprnel2.elet.polimi.it,
+submitted to IEEE Transactions on Systems, Man, and Cybernetics.
+"christof" (Christofide's algorithm), "patching" & "psort" (the Assigment
+Problem's cycles patched together), and "savings" (a savings heuristic)
+were taken from the excellent resource: The_Traveleing_Salesman_Problem, E.
+Lawler, & etc., 1985.  The "loss" tour finder is an implementation of the
+Loss method from the paper by P. Van Der Cruyssen and M. J. Rijckaert from
+Journal of the Operational Reseach Society, 1978, Vol.29 No.7, p697-701.
+
+@node Tour Improvements
+@chapter Tour Improvements
+
+There can also be tour improvements made to tours found by tour finders.
+This can be specified on the command line by defining a tour finder as
+"tour_finder+tour_improvement"; specifying a tour finder name immediately
+followed by a '+' sign immediately followed by a tour improvement name.
+Multiple improvements are allowed for as many '+TourImprover' are
+attached to the tour finder name.  So far we have the following
+tour improvement algorithms.
+
+@example
+TourImprover |  optimal? | Types of TSPs that work best
+-------------+-----------+-----------------------------------
+threeopt     | heuristic | any
+fouropt      | heuristic | Asymmetric
+k3swap       | heuristic | any
+k5swap       | heuristic | Symmetric
+k10swap      | heuristic | Any
+k14swap      | heuristic | Asymmetric
+k17swap      | heuristic | Symmetric
+ropt         | heuristic | Symmetric
+@end example
+
+"threeopt" is the 3-Opt improvement scheme for Asymmetric or Symmetric TSPS.
+"fouropt" is the 4-Opt for Asymmetric TSPs.  "k3swap" is an algorithm which
+linearly goes down the tour looking at every adjacent k=3 cities and
+re-arranges k cities within the tour until in a permutation that makes the
+tour the best it can be.  "k14swap" or any other kXswap algorithm does the
+same thing as k3swap but for k=X cities.  The Symmetric kswaping heuristics
+are Slower than the Asymmetric ones. "ropt" is an implementation of the 1973
+Lin and Kernighan paper, however without back tracking.
+
+@node Messages
+@chapter Messages
+
+@table @samp
+@item Could Not Run Tour Finder : XXX
+Is triggered if the matrix input is not able to be run with the tour finder.
+Usually, there is an explanation why the matrix can't be used with the given
+tour finder.
+
+@item No Tour Found
+The tour finder could not find a tour given the matrix.  This is usually a bug
+in the tour finder or an improper specification of the -o option with branch
+and bound tour finders.
+
+@item No Tour Finders Specified
+tsp_solve cannot run with out specifying a tour finder on the command line.
+see TOUR FINDERS.
+
+@item Aborted at SEED ???, Sig#???.  So far the Timers show:
+A segfault, arithmetic exception, bus error or other abortive signal has
+occurred.  The Times, Tour lengths (for the algorithms run up to the
+abortion), and the last seed value used to seed the random number generator
+are printed.  If the program wasn't user terminated, it's time to start
+debugging.
+@end table
+
+@node Examples
+@chapter Examples
+
+@table @asis
+@item tsp_solve 10 addition
+Finds a heuristic solution found from running the "addition" tour finder
+using a randomly generated Euclidean TSP of 10 cities.
+
+@item tsp_solve 10 farinsert -m3
+Finds a heuristic solution found from running the "farinsert" tour finder
+using a randomly generated Asymmetric TSP of 10 cities.
+
+@item tsp_solve 80 di+th+k14 loss+th+k14 -m4 -t100
+Generates 100 random Asymmetric oneway 80 city TSPs, and for each finds a
+dispersion heuristic tour solution and a loss heurisitc tour solution, and
+for both performs the threeopt improvement algorithm on each tour, and then
+performs the k14swap improvement on the resulting tours.  The output is
+the average and standard deviation of the sums of the tour lengths generated
+by both tour finder.
+
+@item tsp_solve 10 st far -m2
+Finds an optimal and heuristic solution from the same randomly generated
+Symmetric TSP of 10 cities.
+
+@item tsp_solve 30 -dEUC_2D best heur -t10
+Finds 10 optimal solutions and 10 heuristic solutions from the "heurbest"
+heuristic from 10 randomly generated Euclidean TSPs of 15 cities using EUC_2D
+type distances.
+
+@item tsp_solve 100 b = < 100.coord
+Finds the optimal solution to a 100 city TSP input from the file "100.coord" in
+coordinate format.
+
+@item tsp_solve 20 standard - < 20.matrix
+Finds the optimal solution to a 20 city TSP input from the file "20.matrix" in
+matrix format.
+
+@item cat kroA100.* | tsp_solve --- e
+Given TSPLIB input show the tour found using the "easytour" tour finder.
+kroA100.tsp and kroA100.opt.tour are files from TSPLIB.
+
+@item cat kroA100.* | tsp_solve --- heur -p4 | tsp_solve --- e
+This exemplifies the -p4 output format can be read in by the `---' option.
+The entire invokation will find a heuristic from the kroA100 TSP and then the
+second piped invokation will interpret the TSPLIB output and run "easytour"
+to extract the tour in the order it was inputed.
+
+@item cat Coordinates | tsp_solve 100 e+th = -p1
+Read in a tour defined by the file 'Coordinates' (interpreted by the "easytour"
+tour finder), use the "threeopt" algorithm to improve upon that tour and then
+print out the improved tour's coordinates.
+
+@end table
+
+@node Notes
+@chapter Notes
+
+As of yet there seems to be no published and public domain way to optimally
+solve large non-trivial TSPs with out Linear Programming of more than
+200 cities quickly.  If a program is needed find the optimal solution to
+a large TSP, most likely tsp_solve will run for years if too large of a
+TSP is specified.  However, tsp_solve can solve general medium size TSPs
+giving guaranteed optimal solutions as well as provide decent heuristic
+solutions for large TSPs.  To tell if the TSP is too large for this program
+to solve optimally: have a go at it and see how far it gets by sending
+a SIGUSR1 signal to the running process and view the tspinfo.txt file.
+
+@node Bugs
+@chapter Bugs
+
+tsp_solve is geared to fail if it doesn't think it can do the job it was
+asked.  The ANSI assert() macro was used un-conservatively through out
+tsp_solve to verify the accuracy of the result.  If tsp_solve returns with
+a solution and exit code 0, you can be very sure the solution is accurate.
+However, tsp_solve may flunk an assertion and return a "programmer" useful
+message.  To Date, tsp_solve has been run on hundreds of millions of randomly
+generated TSPs with cities numbers ranging from 5 to 50 without assertion
+failures.  In addition, many large TSPs have been solved from the TSPLIB data
+set library.  But, if an assertion does fail, please mail the TSP input,
+command line options, and assertion message to churritz@@cts.com.
+
+@node Contributors
+@chapter Contributors
+
+The following identities are of code contributors to this project.
+
+@example
+churritz@@cts.com
+(619) 565-8656
+Chad Hurwitz
+@end example
+
+@example
+kat3@@ihgp.ih.lucent.com
+AT&T Bell Labs
+R. J. Craig
+Provided: Hungarian Algorithm
+@end example
+
+The following identities deserve Special Thanks for help provided:
+
+@example
+fritzke@@immd2.informatik.uni-erlangen.de
+Universit:at Erlangen-N:urnberg
+Bernd Fritzke and Peter Wilke
+@end example
+
+@example
+dkraay@@hera.mgmt.purdue.edu
+David Kraay
+@end example
+
+@bye

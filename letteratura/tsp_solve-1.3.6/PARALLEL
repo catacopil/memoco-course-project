@@ -1,0 +1,42 @@
+Notes for designing the parallel communictations of tsp_solve processes
+
+:::
+
+There will only be a select group of tourfinders that can be run in parallel
+when working on a single tsp.  For now "imponetree" will be the only one.
+To start a session start the onetree going with all the options necessary,
+including the "-nX" option of where the tsphost directory will be.
+
+To start additional clients simple use "tsp_solve -nY" on another processor that
+has the same nfs mount Y as X.  How imp-onetree explores all the nodes, is it
+has a queue of tsp branches to explore, when another client starts, that client
+asks for more queue nodes from other already running clients.
+
+The asking of removal or splitting the queue (in addition with the processes
+already taking elements off the queue as the are explored), brings up the
+problem what happens when one client runs out of queue elements.  In a single
+process mode, this would mean we have explored all of the possible nodes, and
+we are done.  However, in a parallel mode we are not done unless all other
+processes do agree that all nodes ave been explored.
+
+The problem exsts in the inconsistancy where after all the nodes are explored
+tsp_solve beleives the tour finder to be finished.  Thus for every group of
+clients that are solving the same tsp, one of them must be the primary client
+which will be the one that finally reports the solution if all of them are done,
+and sends the message that all of them are done.  The primary client is
+determined by the following algorithm
+
+:::
+
+If and only if a process is started with a tour finder(s), it becomes a primary
+client.  Otherwise it starts as a secondary client waiting for something todo.
+
+If a client waiting for something todo finds a todo entry that is associated
+with another running primary client, it becomes a secondary.  If a client
+finds something to do with out a running primary client associated with it, it
+becomes a primary and then takes on the responsibility for all todo lists so
+associated to the missing primary client.  This association rests on a unique
+session id, that is created by finding the largest session id so far in the
+host list when a primary client starts.  This session id is copied from other
+clients when secondary clients find something todo.
+

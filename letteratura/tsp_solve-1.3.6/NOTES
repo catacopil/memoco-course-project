@@ -1,0 +1,79 @@
+tsp_solve  -dK 75 = < FILE  ar
+
+--
+
+brg180 crashes on assignment problem, i even printed out the matrixx
+it was doing and the ap works fine.  the assignor and the assmnt are -1
+in two locations so they should/could have pointed to each other.
+
+#0  0x7ffff3b2 in end ()
+#1  0x52ed4c in end ()
+#2  0x2c5f7 in val__C6Matrixss (this=0x7ffff5e0, from=-1, to=13)
+    at assignql.cc:60
+#3  0x29d75 in __7anode_tPC6MatrixP9TSPSolverd (this=0x52ed4c, m=0x7ffff5e0,
+    s=0x52e89c, most=1951) at assignql.cc:785
+#4  0x2cc1b in __8APSolverPC6Matrix (this=0x52e89c, m=0x7ffff5e0)
+    at assign.cc:85
+#5  0x852 in switch_tourfinders__FsPC6Matrix (x=0, m=0x7ffff5e0)
+    at choice.cc:91
+#6  0x31247 in __8FindTourPCcPC6MatrixP5TimeriP4Tour (this=0x52e84c,
+    abrev=0x470ad "best", m=0x7ffff5e0, add_timer=0x7ffff6a4, invoked=0,
+    to_improve=0x0) at findtour.cc:122
+
+--
+
+find best secord, using min_span algorithm.
+
+--
+
+Prove a single edge not in optimal solution untill you have a small set of
+edges, to permutate.
+
+--
+
+doing full secord, doesn't work but should.
+
+trying single branching but sacred_secord isn't working see -s55 ar
+
+--
+
+may be a way to permutate edges in a manner to get a 1rst/2nd edge aray to
+conform to a tour.
+
+--
+
+solve small optimal subtours and patch to make a larger optimal.
+
+--
+
+make semi neural net to determine which edges are easily improveable and
+then optimally solve those edges keeping the remaining edges of a base tour
+sane, if optimal solver can not improve any more then stop.
+
+--
+
+parallel suspend, make sure you can suspend a parallel process and no one
+will try to send signals to it AND the primary client will still exist as
+long as there are suspended processes running.
+
+--
+
+parallel problem: if a non-primary client finds a better tour, the primary
+client could be in an idle state, and then it would see there are no more
+clients left with out getting the better tour from the non-primary client...
+the only way to do this will probably when i later put in the runner module
+that will be able to save itself and therfore be updated by file.
+
+I'll Try to at the end of the primary client load in the tour file to the last
+TourFinder Run.
+
+--
+
+probelm with processes losing ability to receive signals, maybe i can
+continuously set the catch signal function... or maybe the newer sigactioin
+will work.
+
+--
+
+make kswapping better for onetree's
+
