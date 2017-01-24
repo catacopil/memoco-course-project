@@ -27,3 +27,8 @@
 *.exe
 *.out
 *.app
+
+# CPLEX files
+*.lp
+*.sol
+
