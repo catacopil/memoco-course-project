@@ -11,3 +11,5 @@ Euristiche per il TSP:
  - Algoritmi di insertion (https://heuristicswiki.wikispaces.com/Insertion+%28Heuristic%29)
  	
  	
+ - RISOLUTORE DI GOOGLE: https://developers.google.com/optimization/routing/tsp#solving-tsps-with-the-google-directions-api
+ 
