@@ -12,4 +12,5 @@ Euristiche per il TSP:
  	
  	
  - RISOLUTORE DI GOOGLE: https://developers.google.com/optimization/routing/tsp#solving-tsps-with-the-google-directions-api
+ - Google Charts: https://developers.google.com/chart/interactive/docs/gallery/scatterchart
  

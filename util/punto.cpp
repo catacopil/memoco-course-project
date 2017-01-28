@@ -20,3 +20,4 @@ string Punto::stampa(){
 bool Punto::operator==(const Punto &p) const {
         return (x==p.x && y==p.y);
     }
+

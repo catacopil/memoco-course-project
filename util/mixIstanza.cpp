@@ -80,8 +80,27 @@ int main(int argc, char const *argv[]) {
 		cout << "Letti "<<arr.size() << " interi" << endl;
 		lettorePunti.close();
 		
+		
 		cout << "Memorizzati "<<arr_nodi.size() << " punti" << endl;
 		int N = arr_nodi.size();
+		
+		// ----- 	MISCHIO I PUNTI INSERITI		----------
+		// 	Utile per l'istanza ricavata da Google, affinchè i Punti non siano in ordine
+		
+		random_device rd;
+		mt19937 mt_generator(rd());
+		uniform_int_distribution<int> distribution(0,N-1);
+		
+		for (int i=0; i<80; i++){			// faccio 80 scambi
+			int a = distribution(mt_generator);
+			int b = distribution(mt_generator);
+			cout << "a: "<<a<<" b: "<<b<<"\t";
+			Punto temp = arr_nodi[a];
+			arr_nodi[a] = arr_nodi[b];
+			arr_nodi[b] = temp;
+			
+		}
+		
 		double M[N][N] {0.0};
 		
 		// -----	CALCOLO MATRICE DISTANZE (M)	--------
