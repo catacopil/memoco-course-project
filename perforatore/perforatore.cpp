@@ -6,6 +6,7 @@
 #include <math.h>
 #include <time.h>
 #include "cpxmacro.h"
+#include "istanza.h"
 
 using namespace std;
 
@@ -80,7 +81,8 @@ int indiciY[N][N];
     char sense1 = 'E';
     int matbeg1 = 0;
     for (int i = 0; i < idx1.size(); i++){
-		idx1[i]=i+((nodoStart+1)*(N-1)-N+1);            //TODO: perché non uso le matrici per recuperare gli indici
+    		idx1[i] = 
+		idx1[i] = i+((nodoStart+1)*(N-1)-N+1);            //TODO: perché non uso le matrici per recuperare gli indici
 	}
 	double terminiNoti[1] = {N};
 	CHECKED_CPX_CALL( CPXaddrows, env, lp, 0, 1, idx1.size(), terminiNoti, &sense1, &matbeg1, &idx1[0], &coef1[0], NULL , NULL );
@@ -178,6 +180,24 @@ int main(int argc, char const *argv[]) {
         std::cout << ">>>Eccezione durante lettura parametri: " << e.what() << std::endl;
         return 0;
 	}
+	
+	Istanza ist(fileName);
+	ist.stampaNodi();
+	
+	ist.toFileJSON("Ist_JSON.txt");
+	ist.toFileMatriceDistanze("Ist_MatriceDistanze.txt");
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
         // lettura della prima riga
         try{
             lettoreIstanza.open(fileName);
@@ -210,7 +230,7 @@ int main(int argc, char const *argv[]) {
 				cout << distanze[i][j] << "\t";
 				}
 			cout << " |" << endl;
-			} */
+			} */  /*
             }
 	catch (std::exception& e) {
         std::cout << ">>>Eccezione durante lettura file istanza: " << e.what() << std::endl;
@@ -241,6 +261,8 @@ int main(int argc, char const *argv[]) {
         CPXcloseCPLEX(&env);
     } catch (std::exception& e) {
         cout << ">>>Eccezione durante l'esecuzione del solver: " << e.what() << endl;
-    }
+    } */
+    
+    
     return 1;
 }
