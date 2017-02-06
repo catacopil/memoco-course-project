@@ -1,3 +1,7 @@
+
+#ifndef PUNTO_H
+#define PUNTO_H
+
 #include <iostream>
 #include <sstream> 
 #include <cstdlib>
@@ -16,3 +20,5 @@ public:
 	string stampa();
 	bool operator== (const Punto&) const;
 };
+
+#endif // PUNTO_H

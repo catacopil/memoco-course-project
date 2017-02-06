@@ -18,24 +18,27 @@
 using namespace std;
 
 class Istanza{
+
 public:
-
-	Istanza(int);					// generazione casuale istanza
-	Istanza(string);				// lettura istanza da file
-
-	int getN();
-	void stampaNodi();					// stampa l'istanza (lista di punti)
+	static bool verbose;							// indica se stampare sulla console messaggi di log sull'avanzamento del programma
 	
-	string toFileJSON(string);
-	string toFileMatriceDistanze(string);
+	Istanza(int);									// generazione casuale istanza
+	Istanza(string);								// lettura istanza da file
+
+	int getN();									// restituisce il numero di nodi
+	vector<Punto>* getNodi();						// restituisce un puntatore ad una copia di arr_nodi
+	void stampaNodi();								// stampa l'istanza (lista di punti)
+	
+	string toFileJSON(string);						// esporta in un file di testo l'istanza in formato JSON
+	string toFileMatriceDistanze(string);				// esporta in un file di testo la matrice delle distanze
 	
 
 
 private:
 	int N;
-	vector<Punto> arr_nodi;
-	vector<vector<double>> M;
-	void calcolaMatriceDistanze();
+	vector<Punto> arr_nodi;							// contiene i nodi dell'istanza (lista di punti)
+	vector<vector<double>> M;						// la matrice delle distanze tra i nodi dell'istanza
+	void calcolaMatriceDistanze();					// calcola la matrice delle distanze
 
 };
 

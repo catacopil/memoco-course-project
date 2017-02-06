@@ -7,8 +7,11 @@
 #include <time.h>
 #include "cpxmacro.h"
 #include "istanza.h"
+#include "soluzione.h"
 
 using namespace std;
+
+bool verbose = true;				// indica se stampare sulla console messaggi di log sull'avanzamento del programma
 
 // error status and messagge buffer
 int status;
@@ -181,11 +184,16 @@ int main(int argc, char const *argv[]) {
         return 0;
 	}
 	
-	Istanza ist(fileName);
-	ist.stampaNodi();
+	Istanza* ist = new Istanza(fileName);
+	ist->stampaNodi();
 	
-	ist.toFileJSON("Ist_JSON.txt");
-	ist.toFileMatriceDistanze("Ist_MatriceDistanze.txt");
+	Soluzione* sol = new Soluzione(ist);
+	cout << " Stampo la soluzione di base:"<<endl;
+	sol->stampa();
+	
+	
+	ist->toFileJSON("Ist_JSON.txt");
+	ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
 	
 	
 	

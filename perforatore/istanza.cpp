@@ -9,6 +9,8 @@
 #include <vector>
 #include <math.h>
 
+bool Istanza::verbose = true;
+
 Istanza::Istanza(int numeroNodi = 10){			// costruttore di default oppure costruttore di istanze casuali
 	N = numeroNodi;
 	random_device rd;
@@ -23,14 +25,14 @@ Istanza::Istanza(int numeroNodi = 10){			// costruttore di default oppure costru
 			for (int s=0; s<arr_nodi.size() && not trovato; s++)
 				trovato = (arr_nodi[s]==nuovo);
 			if (trovato){
-				cout<< "Punto già presente: " << nuovo.stampa()<<endl;
+				cout<< " !! Punto già presente: " << nuovo.stampa()<<endl;
 				nuovo = Punto(distribution(mt_generator),distribution(mt_generator));
 				}
 			}
 		arr_nodi.push_back(nuovo);
 		}
 	calcolaMatriceDistanze();
-	cout << " Generati "<<N<<" punti random \n";
+	if (verbose) cout << " Generati "<<N<<" punti random \n";
 }
 
 Istanza::Istanza(string nomeFile){				// costruttore che legge l'istanza da un file
@@ -42,14 +44,14 @@ Istanza::Istanza(string nomeFile){				// costruttore che legge l'istanza da un f
 	
      // INIZIO LETTURA PUNTI
      try{
-	cout << "Inizio lettura punti" << endl;
+	if (verbose) 	cout << "Inizio lettura punti" << endl;
 	lettorePunti.open(nomeFile);
 	char* in = new char[100];
 	lettorePunti.getline(in,100);					// leggo la prima riga per capire quanti nodi ha l'istanza
 	string primaLinea(in);
 	primaLinea.erase(0,4);
 	numeroNodi = stoi(primaLinea);
-	cout << "Nodi: " << numeroNodi << endl;
+	if (verbose) cout << "Nodi: " << numeroNodi << endl;
 	if (lettorePunti.is_open()){
 		while (lettorePunti.get(c)){					// leggo ogni carattere finchè non finisco il file 
 			//cout << c;	
@@ -71,7 +73,7 @@ Istanza::Istanza(string nomeFile){				// costruttore che legge l'istanza da un f
 					Punto nuovo(x, y);
 					// ATTENZIONE: NO CONTROLLO DUPLICATI
 					arr_nodi.push_back(nuovo);
-					cout << " Letto ["<< x <<","<< y <<"]\t";
+					if (verbose) cout << " Letto ["<< x <<","<< y <<"]\t";
 					x = y = 0;
 					hox = hoy = false;
 					}
@@ -92,15 +94,23 @@ void Istanza::stampaNodi(){
 		Punto p = arr_nodi[k];
 		cout << k << ") " << p.stampa() << endl;
 		}
-	cout << " Stampati i "<<arr_nodi.size()<< " nodi dell'istanza \n";
+	cout << endl;
+	if (verbose) cout << " Stampati i "<<arr_nodi.size()<< " nodi dell'istanza \n";
 }
 
 int Istanza::getN(){
 	return N;
 }
 
+vector<Punto>* Istanza::getNodi(){
+//  --------	CREA UNA COPIA DEI NODI DELL'ISTANZA	----------
+	vector<Punto>* copia = new vector<Punto>;
+	*copia = arr_nodi;
+	return copia;
+}
+
 string Istanza::toFileJSON(string nomeFile = ""){
-	// -----		GENERAZIONE ISTANZA CON I PUNTI IN FORMATO JSON
+// -----		GENERAZIONE ISTANZA CON I PUNTI IN FORMATO JSON		--------
 	FILE* pFile;
 	string nomeFileJSON = nomeFile;
 	if (nomeFileJSON == "")
@@ -120,12 +130,12 @@ string Istanza::toFileJSON(string nomeFile = ""){
 	}
 	else
 		cout << "Errore scrittura file "<< nomeFileJSON << endl;
-    cout << " Generato il file " << nomeFileJSON << " con l'istanza in formato JSON | " << N << " nodi" << endl;
-    return nomeFileJSON;
+	cout << " Generato il file " << nomeFileJSON << " con l'istanza in formato JSON | " << N << " nodi" << endl;
+	return nomeFileJSON;
 }
 
 string Istanza::toFileMatriceDistanze(string nomeFile = ""){
-	// -------	SCRITTURA MATRICE SU FILE		--------		
+// -------	SCRITTURA MATRICE DISTANZE SU FILE		--------		
 	FILE* pFile;
 	string nomeFileOut = nomeFile;
 	if (nomeFileOut == "")
@@ -143,6 +153,7 @@ string Istanza::toFileMatriceDistanze(string nomeFile = ""){
 }
 
 void Istanza::calcolaMatriceDistanze(){
+//  --------	CALCOLA MATRICE DELLE DISTANZE TRA I NODI	----------
 	M.resize(N);
 	for (int k=0; k<N; k++)			// sistemo la dimensione dell'array
 		M[k].resize(N);
@@ -154,5 +165,6 @@ void Istanza::calcolaMatriceDistanze(){
 			Punto B = arr_nodi[j];
 			M[i][j] = A.distanza(&B);
 			}
+	if (verbose) cout << " Effettuato il calcolo della matrice delle distanze tra " << arr_nodi.size() << " nodi" << endl;
 }
 
