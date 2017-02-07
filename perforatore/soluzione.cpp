@@ -1,5 +1,5 @@
 /*
-*	Implementazione della classe Istanza
+*	Implementazione della classe Soluzione
 *
 */
 
@@ -11,7 +11,8 @@
 
 bool Soluzione::verbose = true;
 
-Soluzione::Soluzione(Istanza* i){			// costruttore di default oppure costruttore di istanze casuali
+Soluzione::Soluzione(Istanza* i){
+//  -------	COSTRUTTORE SEMPLICE, CHE UTILIZZA L'ORDINE ATTUALE DEI NODI NELL'ISTANZA COME SOLUZIONE
 	ist = i;
 	ordinati = *(ist->getNodi());
 	N = ordinati.size();
@@ -19,9 +20,19 @@ Soluzione::Soluzione(Istanza* i){			// costruttore di default oppure costruttore
 }
 
 
+Soluzione::Soluzione(Istanza* i, vector<Punto>* v){
+// ---------	COSTRUTTORE CON ARRAY DI NODI ORDINATI
+	ist = i;
+	ordinati = *v;
+	N = ordinati.size();
+	if (verbose) cout << " Soluzione creata con i "<<N<<" punti dati \n";
+}
+
+
 int Soluzione::getN(){
 	return N;
 }
+
 
 void Soluzione::stampa(){
 //  -------	STAMPA A VIDEO I PUNTI DELLA SOLUZIONE  	--------
@@ -33,6 +44,7 @@ void Soluzione::stampa(){
 	cout << endl;
 	if (verbose) cout << " Stampati i "<<ordinati.size()<< " nodi della soluzione \n";
 }
+
 
 string Soluzione::toFileJSON(string nomeFile = ""){
 // -----		STAMPA SU FILE I PUNTI IN FORMATO JSON		--------
