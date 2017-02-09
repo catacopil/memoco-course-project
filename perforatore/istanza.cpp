@@ -98,9 +98,11 @@ void Istanza::stampaNodi(){
 	if (verbose) cout << " Stampati i "<<arr_nodi.size()<< " nodi dell'istanza \n";
 }
 
+
 int Istanza::getN(){
 	return N;
 }
+
 
 vector<Punto>* Istanza::getNodi(){
 //  --------	CREA UNA COPIA DEI NODI DELL'ISTANZA	----------
@@ -108,6 +110,15 @@ vector<Punto>* Istanza::getNodi(){
 	*copia = arr_nodi;
 	return copia;
 }
+
+
+vector<vector<double>>* Istanza::getDistanze(){
+//  --------	CREA UNA COPIA DELLA MATRICE DELLE DISTANZE 	-------
+	vector<vector<double>>* copia = new vector<vector<double>>;
+	*copia = M;
+	return copia;
+}
+
 
 string Istanza::toFileJSON(string nomeFile = ""){
 // -----		GENERAZIONE ISTANZA CON I PUNTI IN FORMATO JSON		--------

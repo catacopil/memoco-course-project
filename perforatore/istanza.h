@@ -27,6 +27,7 @@ public:
 
 	int getN();									// restituisce il numero di nodi
 	vector<Punto>* getNodi();						// restituisce un puntatore ad una copia di arr_nodi
+	vector<vector<double>>* getDistanze();				// restituisce la matrice delle distanze
 	void stampaNodi();								// stampa l'istanza (lista di punti)
 	
 	string toFileJSON(string);						// esporta in un file di testo l'istanza in formato JSON

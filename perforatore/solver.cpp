@@ -16,7 +16,7 @@ Solver::Solver(Istanza* i){
 }
 
 
-Soluzione::Soluzione(Istanza* i, Soluzione* s){
+Solver::Solver(Istanza* i, Soluzione* s){
 // ---------	COSTRUTTORE ISTANZA E SOLUZIONE ESISTENTE
 // TODO: 	HA SENSO QUESTO COSTRUTTORE? Ha senso creare un solver con già una soluzione?
 	ist = i;

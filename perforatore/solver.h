@@ -21,10 +21,10 @@ public:
 	Solver(Istanza*);								// Solver creato di default per un'istanza ---> crea una Soluzione di default
 	Solver(Istanza*, Soluzione*);						// Solver creato con soluzione già esistente
 	
-//	void risolvi();
+//	virtual void risolvi();
 	Soluzione* getSoluzione();
 
-private:
+protected:
 	Istanza* ist;
 	Soluzione* sol;
 	
