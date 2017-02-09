@@ -21,7 +21,7 @@ Soluzione::Soluzione(Istanza* i){
 
 
 Soluzione::Soluzione(Istanza* i, vector<Punto>* v){
-// ---------	COSTRUTTORE CON ARRAY DI NODI ORDINATI
+// ---------	COSTRUTTORE CON ARRAY DI NODI ORDINATI	---------
 	ist = i;
 	ordinati = *v;
 	N = ordinati.size();
@@ -31,6 +31,28 @@ Soluzione::Soluzione(Istanza* i, vector<Punto>* v){
 
 int Soluzione::getN(){
 	return N;
+}
+
+
+double Soluzione::getFO(){
+	return FO;
+}
+
+
+double Soluzione::calcolaFO(){
+//	-------	CALCOLA LA FUNZIONE OBIETTIVO  	-------
+	double tot = 0.0;
+	for(int i=0; i<ordinati.size(); i++){
+		Punto A = ordinati[i];
+		Punto B(0,0);
+		if ((i+1)<ordinati.size())
+			B = ordinati[i+1];
+		else
+			B = ordinati[0];
+		tot = tot + A.distanza(&B);
+		}
+	
+	return tot;
 }
 
 

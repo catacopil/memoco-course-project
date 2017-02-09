@@ -12,11 +12,12 @@ bool CPLEX_Solver::verbose = true;
 
 CPLEX_Solver::CPLEX_Solver(Istanza* i, CEnv e, Prob prob):Solver(i), ENV(e), LP(prob){
 //  -------	COSTRUTTORE SEMPLICE
-	tempoRisoluzione = 0.0;
+	tempoRisoluzione = -1.0;
+	valoreFO = -1.0;
 	
 	try {		
 		setupLP();			// imposta il modello 
-		CHECKED_CPX_CALL(CPXwriteprob, ENV, LP, "perforatore.lp", NULL);		// scrive il modello su file
+		CHECKED_CPX_CALL(CPXwriteprob, ENV, LP, "util/perforatore.lp", NULL);		// scrive il modello su file
 		
 	} catch (std::exception& e) {
 		cout << ">>>Eccezione durante la creazione e impostazione del solver CPLEX: " << e.what() << endl;
@@ -26,20 +27,13 @@ CPLEX_Solver::CPLEX_Solver(Istanza* i, CEnv e, Prob prob):Solver(i), ENV(e), LP(
 	if (verbose) cout << " Solver CPLEX creato per l'istanza richiesta \n";
 }
 
-CPLEX_Solver::~CPLEX_Solver(){
-	try{
-		
-	} catch (std::exception& e) {
-		cout << ">>>Eccezione durante l'esecuzione del solver CPLEX: " << e.what() << endl;
-	}
-	
-	if (verbose) cout << " Fine distruttore per Solver CPLEX ";
+CPLEX_Solver::~CPLEX_Solver(){	// TODO: ha senso il distruttore esplicito ?? Non distrugge niente
+	if (verbose) cout << " Distrutto Solver CPLEX ";
 }
 
 void CPLEX_Solver::risolvi(){	
 //  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
 // TODO: DA RITORNARE UN OGGETTO Soluzione*  -----> meglio fare un metodo a parte per questo
-	double val_soluzione;
 	try{
 		// TODO: sistemare il tempo, usando timeResolution
 		cout << " Inizia l'esecuzione del solver...." << endl;
@@ -55,10 +49,10 @@ void CPLEX_Solver::risolvi(){
 		else
 			cout << " Problema risolto in "<< tempo <<" clocks ("<< tempoRisoluzione <<" secondi)"<< endl;
 		
-		CHECKED_CPX_CALL(CPXgetobjval, ENV, LP, &val_soluzione);
+		CHECKED_CPX_CALL(CPXgetobjval, ENV, LP, &valoreFO);
 
-		cout << " Valore funzione obiettivo: " << val_soluzione << endl;				// stampa il valore della funzione obiettivo per la soluzione ottima
-		//CHECKED_CPX_CALL(CPXsolwrite, ENV, LP, "perforatore.sol");				// stampa la soluzione su file
+		cout << " Valore funzione obiettivo: " << valoreFO << endl;					// stampa il valore della funzione obiettivo per la soluzione ottima
+		CHECKED_CPX_CALL(CPXsolwrite, ENV, LP, "util/perforatore.sol");				// stampa la soluzione su file
 		
 	}
 	catch (std::exception& e) {
@@ -67,14 +61,29 @@ void CPLEX_Solver::risolvi(){
 	cout << " Problema risolto con il Solver CPLEX! \n";
 }
 
+double CPLEX_Solver::getFO(){
+	return valoreFO;
+}
+
+double CPLEX_Solver::getTempoRisoluzione(){
+	return tempoRisoluzione;
+}
+
 Soluzione* CPLEX_Solver::getSoluzione(){
+// TODO: sistemare, creando la soluzione reale 
 	sol = new Soluzione(ist);
 	return sol;
 }
 
+void recuperaSoluzione(){
+//  ---------	GENERA UN OGGETTO SOLUZIONE, RECUPERANDO I DATI DALLA SOLUZIONE DI CPLEX
+//	TODO: da implementare per poter fare i disegni del percorso scelto (se richiede meno dell'attività manuale)
+
+	return;
+}
+
 
 void CPLEX_Solver::setupLP() {
-
 	const int NAME_SIZE = 512;					// array di caratteri per salvare i nomi delle variabili
 	char name[NAME_SIZE];
 	

@@ -21,6 +21,8 @@ public:
 	Solver(Istanza*);								// Solver creato di default per un'istanza ---> crea una Soluzione di default
 	Solver(Istanza*, Soluzione*);						// Solver creato con soluzione già esistente
 	
+	~Solver();
+	
 //	virtual void risolvi();
 	Soluzione* getSoluzione();
 

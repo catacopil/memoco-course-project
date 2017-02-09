@@ -27,6 +27,7 @@ public:
 	Soluzione(Istanza*, vector<Punto>*);				// Soluzione creata con un array di punti 
 
 	int getN();									// restituisce il numero di nodi
+	double getFO();								// restituisce il valore della Funzione Obiettivo della soluzione corrente
 	void stampa();									// stampa l'istanza (lista di punti)
 	
 	string toFileJSON(string);						// esporta in un file di testo la soluzione in formato JSON 
@@ -35,8 +36,10 @@ public:
 
 private:
 	int N;
+	double FO;
 	Istanza* ist;
 	vector<Punto> ordinati;							// contiene i nodi dell'istanza (lista di punti) 
+	double calcolaFO();
 
 };
 

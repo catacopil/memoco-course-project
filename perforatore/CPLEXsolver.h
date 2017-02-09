@@ -25,7 +25,9 @@ public:
 	CPLEX_Solver(Istanza*, CEnv, Prob);								// Solver creato di default per un'istanza ---> crea una Soluzione di default
 	
 	void risolvi();
-	Soluzione* getSoluzione();
+	Soluzione* getSoluzione();							// ritorna la Soluzione (quella di default per adesso ---> TODO: da sistemare)
+	double getTempoRisoluzione();							// ritorna il tempo (in secondi) impiegato per la risoluzione, se non ancora risolto ritorna -1
+	double getFO();									// ritorna il valore della Funzione Obiettivo, se non ancora risolto ritorna -1
 	
 	~CPLEX_Solver();
 
@@ -33,6 +35,7 @@ private:
 	const CEnv ENV;
 	Prob LP;
 	double tempoRisoluzione;
+	double valoreFO;
 	void setupLP();
 };
 

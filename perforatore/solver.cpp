@@ -24,6 +24,11 @@ Solver::Solver(Istanza* i, Soluzione* s){
 	if (verbose) cout << " Solver creato per l'istanza richiesta con la soluzione passata \n";
 }
 
+Solver::~Solver(){
+//  --------	DISTRUTTORE
+	delete sol;
+	if (verbose) cout << " Distrutto Solver \n";
+}
 
 Soluzione* Solver::getSoluzione(){
 	return sol;
