@@ -159,7 +159,7 @@ string Istanza::toFileMatriceDistanze(string nomeFile = ""){
 			fprintf(pFile, " \n");
 			}
 		fclose(pFile);
-	cout << "Generato il file " << nomeFileOut << " con la matrice delle distanze tra i " << N << " nodi" << endl;
+	cout << " Generato il file " << nomeFileOut << " con la matrice delle distanze tra i " << N << " nodi" << endl;
 	return nomeFileOut;
 }
 

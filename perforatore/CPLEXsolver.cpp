@@ -35,19 +35,23 @@ void CPLEX_Solver::risolvi(){
 //  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
 // TODO: DA RITORNARE UN OGGETTO Soluzione*  -----> meglio fare un metodo a parte per questo
 	try{
-		// TODO: sistemare il tempo, usando timeResolution
 		cout << " Inizia l'esecuzione del solver...." << endl;
 		clock_t tempo = clock();
+		std::chrono::high_resolution_clock::time_point inizio = std::chrono::high_resolution_clock::now();
 		CHECKED_CPX_CALL(CPXmipopt, ENV, LP);									// esecuzione del solver
 		tempo = clock() - tempo;
 		tempoRisoluzione = ((float)tempo/CLOCKS_PER_SEC);
-		if (tempoRisoluzione >= 60.0){
+		std::chrono::high_resolution_clock::time_point fine = std::chrono::high_resolution_clock::now();
+		//secondi duration = fine - inizio;
+		auto duration = std::chrono::duration_cast<std::chrono::seconds>(fine - inizio);
+		//tempoRisoluzione = duration/1000;
+		/*if (tempoRisoluzione >= 60.0){
 			int minuti = tempoRisoluzione/60;
 			double secondi = fmod(tempoRisoluzione, 60);
 			cout << " Problema risolto in "<< tempo <<" clocks ("<< minuti <<" minuti e "<< secondi <<" secondi)"<< endl;
 			}
-		else
-			cout << " Problema risolto in "<< tempo <<" clocks ("<< tempoRisoluzione <<" secondi)"<< endl;
+		else */
+			cout << " Problema risolto in "<< tempo <<" clocks ("<< duration.count() <<" secondi)"<< endl;
 		
 		CHECKED_CPX_CALL(CPXgetobjval, ENV, LP, &valoreFO);
 
@@ -191,7 +195,7 @@ void CPLEX_Solver::setupLP() {
 	//Aggiunta vincolo 3
     for (int i = 0; i < N; i++){
         std::vector<int> idx(N-1);
-        std::vector<double> coef(N-1, 1);        // coeff contiene solo i coefficienti diversi da zero
+        std::vector<double> coef(N-1, 1); 
         char sense = 'E';
         int index = 0;
         for (int j = 0; j <= (N-1); j++){
@@ -208,7 +212,7 @@ void CPLEX_Solver::setupLP() {
     for (int j = 0; j < N; j++)
     {
         std::vector<int> idx(N-1);
-        std::vector<double> coef(N-1, 1);        // coeff contiene solo i coefficienti diversi da zero
+        std::vector<double> coef(N-1, 1);  
         char sense = 'E';
         int index = 0;
         for (int i = 0; i <= (N-1); i++){
@@ -226,7 +230,7 @@ void CPLEX_Solver::setupLP() {
 	   for (int j = 0; j <= (N-1); j++){
 		 if (j==i) continue;
             std::vector<int> idx(2);
-            std::vector<double> coef(2, 1);        	// coeff contiene solo i coefficienti diversi da zero
+            std::vector<double> coef(2, 1); 
             coef[1]=-N;
 
             char sense = 'L';

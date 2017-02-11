@@ -1,44 +1,43 @@
 /*
-*	Classe CPLEX Solver: definisce un oggetto che risolve un problema TSP utilizzando la libreria CPLEX. 
+*	Classe Nearest Solver: definisce un oggetto che risolve un problema TSP con l'euristica Nearest Neighbor (sceglie il più punto più vicino). 
 *	Contiene un puntatore ad un oggetto Istanza e ad un oggetto soluzione creato dopo aver risolto il problema
 *	
 */
 
 
-#ifndef CPLEX_SOLVER_H
-#define CPLEX_SOLVER_H
+#ifndef NEAREST_SOLVER_H
+#define NEAREST_SOLVER_H
 
 #include <iostream>
 #include <string>
 #include <math.h>
 #include <time.h>
-#include <chrono>
-#include "cpxmacro.h"
+#include <float.h>
+#include <algorithm>
 #include "solver.h"
+#include "punto.h"
 
 using namespace std;
 
 
-class CPLEX_Solver: public Solver{
+class NearSolver: public Solver{
 public:
 	static bool verbose;								// indica se stampare sulla console messaggi di log sull'avanzamento del programma
 
-	CPLEX_Solver(Istanza*, CEnv, Prob);								// Solver creato di default per un'istanza ---> crea una Soluzione di default
+	NearSolver(Istanza*);								// Creazione del solver, collegandolo con l'oggetto Istanza che deve risolvere
 	
-	void risolvi();
-	Soluzione* getSoluzione();							// ritorna la Soluzione (quella di default per adesso ---> TODO: da sistemare)
+	void risolvi(int);
+	Soluzione* getSoluzione();							// ritorna la Soluzione
 	double getTempoRisoluzione();							// ritorna il tempo (in secondi) impiegato per la risoluzione, se non ancora risolto ritorna -1
 	double getFO();									// ritorna il valore della Funzione Obiettivo, se non ancora risolto ritorna -1
 	
-	~CPLEX_Solver();
+// 	~NearSolver();		TODO: SERVE ?
 
 private:
-	const CEnv ENV;
-	Prob LP;
 	double tempoRisoluzione;
 	double valoreFO;
-	void setupLP();
+	vector<vector<double>>* distanze;
 };
 
 
-#endif // CPLEX_SOLVER_H
+#endif // NEAREST_SOLVER_H

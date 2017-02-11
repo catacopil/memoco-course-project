@@ -10,6 +10,7 @@
 #include "soluzione.h"
 #include "solver.h"
 #include "CPLEXsolver.h"
+#include "Nearsolver.h"
 
 using namespace std;
 
@@ -23,8 +24,10 @@ int main(int argc, char const *argv[]) {
 	// 	DICHIARAZIONE VARIABILI PER CPLEX
 	DECL_ENV(env);
 	DECL_PROB(env, lp);
+	
+	typedef std::chrono::duration<double> secondi;
 
-	int numeroNodi=10;						// numero di nodi del problema
+	int numeroNodi=0;						// numero di nodi del problema
 	string fileName;						// nome del file che contiene l'istanza del problema
 	ifstream lettoreIstanza;
 	if (argc != 2){
@@ -34,19 +37,28 @@ int main(int argc, char const *argv[]) {
 		return 0;
 	}
 	try{
-            fileName = argv[1];
+		numeroNodi = stoi(argv[1]);
 	}
 	catch (std::exception& e) {
-        cout << ">>> Eccezione durante lettura parametri: " << e.what() << std::endl;
-        return 0;
+		cout << ">>>Eccezione nella lettura del parametro numerico in input " << e.what() << endl;
+		try{
+            fileName = argv[1];
+		}
+		catch (std::exception& e) {
+			cout << ">>> Eccezione durante lettura parametro stringa " << e.what() << std::endl;
+			return 0;
+		}
 	}
-	
-	Istanza* ist = new Istanza(fileName);
-	ist->stampaNodi();
+	Istanza* ist;
+	if (numeroNodi!=0)
+		ist = new Istanza(numeroNodi);
+	else 
+		ist = new Istanza(fileName);
+	//ist->stampaNodi();
 	
 	Soluzione* sol = new Soluzione(ist);
-	cout << " Stampo la soluzione di base:"<<endl;
-	sol->stampa();
+	//cout << " Stampo la soluzione di base:"<<endl;
+	//sol->stampa();
 	
 	
 	ist->toFileJSON("Ist_JSON.txt");
@@ -54,10 +66,27 @@ int main(int argc, char const *argv[]) {
 	
 	CPLEX_Solver* CPX = new CPLEX_Solver(ist, env, lp);
 	CPX->risolvi();
-
-
-
-
+	
+	NearSolver* NS = new NearSolver(ist);
+	
+	double minimo = 1000000000;
+	for (int k=0; k<ist->getN();k++){
+		NS->risolvi(k);
+		if (NS->getFO()<minimo)
+			minimo = NS->getFO();
+	}
+	cout << " Il minimo per Nearest Neighbor è: "<< minimo << endl;
+	cout << " Il minimo per CPLEX è: "<< CPX->getFO() << endl;
+	
+	
+	
+	
+	
+	// CANCELLA OGGETTI DALLO STACK
+	delete CPX;
+	delete sol;
+	delete ist;
+	
 	
 	// LIBERA MEMORIA CPLEX
 	CPXfreeprob(env, &lp);
