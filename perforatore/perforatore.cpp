@@ -11,6 +11,7 @@
 #include "solver.h"
 #include "CPLEXsolver.h"
 #include "Nearsolver.h"
+#include "Miosolver.h"
 
 using namespace std;
 
@@ -54,29 +55,50 @@ int main(int argc, char const *argv[]) {
 		ist = new Istanza(numeroNodi);
 	else 
 		ist = new Istanza(fileName);
-	//ist->stampaNodi();
 	
 	Soluzione* sol = new Soluzione(ist);
 	//cout << " Stampo la soluzione di base:"<<endl;
 	//sol->stampa();
 	
-	
-	ist->toFileJSON("Ist_JSON.txt");
+	string nomeFileIst = "Ist_JSON";
+	nomeFileIst = nomeFileIst+to_string(ist->getN())+".txt";
+	ist->toFileJSON(nomeFileIst);
 	ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
 	
 	CPLEX_Solver* CPX = new CPLEX_Solver(ist, env, lp);
-	CPX->risolvi();
+	//CPX->risolvi();
 	
 	NearSolver* NS = new NearSolver(ist);
+	NS->risolvi(3);
 	
-	double minimo = 1000000000;
-	for (int k=0; k<ist->getN();k++){
-		NS->risolvi(k);
-		if (NS->getFO()<minimo)
-			minimo = NS->getFO();
-	}
-	cout << " Il minimo per Nearest Neighbor è: "<< minimo << endl;
+	Soluzione* solInteressante;
+	Soluzione* solMia;
+	
+	
+	MioSolver* MIO = new MioSolver(ist,ist->getN());
+	double minimoMio = 1000000000;
+	int maxProve = 30;
+	/*for (int i=0; i<maxProve; i++){
+		MIO->risolvi(i);
+		if (MIO->getFO()<minimoMio){
+			minimoMio = MIO->getFO();
+			}
+	}*/
+	MIO->risolvi(0);
+	
+	
+	solInteressante = NS->getSoluzione();
+	solMia = MIO->getSoluzione();
+
+	solInteressante->toFileJSON("util/disegno istanze/solNearest.txt");
+	solMia->toFileJSON("util/disegno istanze/solMia.txt");
+	
+	
 	cout << " Il minimo per CPLEX è: "<< CPX->getFO() << endl;
+//	cout << " Il minimo per Mio Solver è: "<< minimoMio << endl;
+	cout << " Il minimo per Mio Solver è: "<< MIO->getFO() << " [partenza: 0]"<< endl;
+	cout << " Il minimo per Nearest Neighbor è: "<< NS->getFO() << " [partenza: 0]"<< endl;
+	
 	
 	
 	
@@ -84,6 +106,8 @@ int main(int argc, char const *argv[]) {
 	
 	// CANCELLA OGGETTI DALLO STACK
 	delete CPX;
+	delete NS;
+	delete MIO;
 	delete sol;
 	delete ist;
 	

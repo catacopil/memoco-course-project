@@ -9,13 +9,14 @@
 #include <vector>
 #include <math.h>
 
-bool Soluzione::verbose = true;
+bool Soluzione::verbose = false;
 
 Soluzione::Soluzione(Istanza* i){
 //  -------	COSTRUTTORE SEMPLICE, CHE UTILIZZA L'ORDINE ATTUALE DEI NODI NELL'ISTANZA COME SOLUZIONE
 	ist = i;
 	ordinati = *(ist->getNodi());
 	N = ordinati.size();
+	FO = calcolaFO();
 	if (verbose) cout << " Soluzione generata per i "<<N<<" punti in ordine di istanza \n";
 }
 
@@ -25,6 +26,7 @@ Soluzione::Soluzione(Istanza* i, vector<Punto>* v){
 	ist = i;
 	ordinati = *v;
 	N = ordinati.size();
+	FO = calcolaFO();
 	if (verbose) cout << " Soluzione creata con i "<<N<<" punti dati \n";
 }
 
@@ -45,13 +47,13 @@ double Soluzione::calcolaFO(){
 	for(int i=0; i<ordinati.size(); i++){
 		Punto A = ordinati[i];
 		Punto B(0,0);
-		if ((i+1)<ordinati.size())
+		if ((i+1)<ordinati.size())					// calcola sempre la distanza con il successivo, a parte l'ultimo dove prende la distanza tra ultimo e primo
 			B = ordinati[i+1];
 		else
 			B = ordinati[0];
 		tot = tot + A.distanza(&B);
+		//cout << " tot FO = " << tot << endl;
 		}
-	
 	return tot;
 }
 

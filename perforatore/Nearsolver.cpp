@@ -8,7 +8,7 @@
 
 
 
-bool NearSolver::verbose = true;
+bool NearSolver::verbose = false;
 
 NearSolver::NearSolver(Istanza* i):Solver(i){
 //  -------	COSTRUTTORE SEMPLICE
@@ -16,36 +16,26 @@ NearSolver::NearSolver(Istanza* i):Solver(i){
 	valoreFO = -1.0;
 	distanze = ist->getDistanze();
 	
-	
-	
-	try {		
-		
-	} catch (std::exception& e) {
-		cout << ">>>Eccezione durante la creazione e impostazione del solver Nearest Neighbor: " << e.what() << endl;
-		return;
-	} 
-	
 	if (verbose) cout << " Solver Nearest Neighbor creato per l'istanza richiesta \n";
 }
 
 
-void NearSolver::risolvi(int init){	
+void NearSolver::risolvi(int start){	
 //  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
 
 	try{
-		valoreFO = 0.0;
 		vector<int> giainseriti;
 		vector<vector<double>>* distanze = ist->getDistanze();
 		vector<Punto>* nodiIstanza = ist->getNodi();
 		vector<Punto> ordinati;
-		int ultimoinserito = init;
+		int ultimoinserito = start;
 		int ilminore = 0;
 		int numeroNodi = ist->getN();
-		cout << " Inizia l'esecuzione del solver...." << endl;
+		cout << " Inizia l'esecuzione del NearSolver...." << endl;
 		clock_t tempo = clock();
 		
 		ordinati.push_back((*nodiIstanza)[ultimoinserito]); 				// inserisco il primo
-		giainseriti.push_back(0);
+		giainseriti.push_back(start);
 		for (int i=1; i<numeroNodi; i++){
 			// parto con i=1 perché il primo l'ho già inserito e faccio girare il ciclo N-1 volte
 			
@@ -66,11 +56,14 @@ void NearSolver::risolvi(int init){
 			// lo aggiungo a ordinati, aggiorno gli indici e aggiorno il totale
 			ordinati.push_back((*nodiIstanza)[ilminore]);
 			giainseriti.push_back(ilminore);
-			valoreFO = valoreFO + (*distanze)[ultimoinserito][ilminore];
 			ultimoinserito = ilminore;
-					
+			
 		}
-		valoreFO = valoreFO + (*distanze)[ultimoinserito][init];				// completa il giro tornando al nodo di partenza
+		
+		// creo oggetto Soluzione e aggiorno la funzione obiettivo
+		sol = new Soluzione(ist, &ordinati);
+		valoreFO = sol->getFO();
+		
 		
 		tempo = clock() - tempo;
 		tempoRisoluzione = ((float)tempo/CLOCKS_PER_SEC);
@@ -82,7 +75,7 @@ void NearSolver::risolvi(int init){
 		else
 			cout << " Problema risolto in "<< tempo <<" clocks ("<< tempoRisoluzione <<" secondi)"<< endl;
 		
-		cout << " Valore funzione obiettivo: " << valoreFO << " [init: "<< init <<"]"<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
+		cout << " Valore funzione obiettivo: " << valoreFO << " [start: "<< start <<"]"<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
 		
 	}
 	catch (std::exception& e) {

@@ -13,7 +13,7 @@ double Punto::distanza(Punto* B){			// distanza dal punto B
 
 string Punto::stampa(){
 	ostringstream out;
-	out << "Punto: (" << x << ", " << y << ")";
+	out << " (" << x << ", " << y << ") ";
 	return out.str();
 	}
 
