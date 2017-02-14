@@ -6,7 +6,7 @@
 #include "solver.h"
 #include <iostream>
 
-bool Solver::verbose = true;
+bool Solver::verbose = false;
 
 Solver::Solver(Istanza* i){
 //  -------	COSTRUTTORE SEMPLICE, CREA UNA SOLUZIONE DI DEFAULT PER L'ISTANZA

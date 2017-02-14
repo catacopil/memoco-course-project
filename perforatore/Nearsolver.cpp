@@ -31,7 +31,7 @@ void NearSolver::risolvi(int start){
 		int ultimoinserito = start;
 		int ilminore = 0;
 		int numeroNodi = ist->getN();
-		cout << " Inizia l'esecuzione del NearSolver...." << endl;
+		cout << "\n Inizia l'esecuzione del NearSolver...." << endl;
 		clock_t tempo = clock();
 		
 		ordinati.push_back((*nodiIstanza)[ultimoinserito]); 				// inserisco il primo
@@ -79,7 +79,7 @@ void NearSolver::risolvi(int start){
 		
 	}
 	catch (std::exception& e) {
-		cout << ">>> Eccezione durante l'esecuzione del Solver Nearest Neighbor: " << e.what() << endl;
+		cout << ">>> Eccezione durante l'esecuzione del Solver Nearest Neighbor: " << e.what() << endl<<endl;
 	}
 	//cout << " Problema risolto con il Solver Nearest Neighbor! \n";
 }

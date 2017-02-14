@@ -16,7 +16,7 @@ MioSolver::MioSolver(Istanza* i, int kappa):Solver(i),maxK(kappa){
 	valoreFO = -1.0;
 	distanze = ist->getDistanze();
 	
-	if (verbose) cout << " Solver Nearest Neighbor creato per l'istanza richiesta \n";
+	if (verbose) cout << " MioSolver creato per l'istanza richiesta \n";
 }
 
 
@@ -31,7 +31,7 @@ void MioSolver::risolvi(int start){
 		int ultimoinserito = start;
 		int ilminore = 0;
 		int numeroNodi = ist->getN();
-		cout << " Inizia l'esecuzione del MioSolver...." << endl;
+		cout << "\n Inizia l'esecuzione del MioSolver...." << endl;
 		clock_t tempo = clock();
 		
 		ordinati.push_back((*nodiIstanza)[ultimoinserito]); 				// inserisco il primo
@@ -72,7 +72,7 @@ void MioSolver::risolvi(int start){
 			// ALGORITMO ITERATIVO CHE RIORDINA GLI ULTIMI K PER OGNI INSERIMENTO
 				// trovo i K punti inseriti più vicini a quello da inserire e li metto in Kvicini (in ordine decrescente)
 				Punto daAggiungere = (*nodiIstanza)[ilminore];
-				cout << " Il prossimo da aggiungere è "<< daAggiungere.stampa() <<endl;
+				// cout << " Il prossimo da aggiungere è "<< daAggiungere.stampa() <<endl;
 				int Kvicini[K]{-1};
 				for (int j=0; j<K; j++)			// inserisco i primi K in Kvicini
 					Kvicini[j] = j;
@@ -106,6 +106,7 @@ void MioSolver::risolvi(int start){
 						}
 					}
 				//  STAMPA dell'array Kvicini
+				/*
 				cout << " Kvicini: ";
 				for (int j=0; j<K; j++){
 					double d = ordinati[Kvicini[j]].distanza(&daAggiungere);
@@ -116,7 +117,7 @@ void MioSolver::risolvi(int start){
 						throw runtime_error(" Trovata distanza 0 tra punti!");
 						}
 					}
-				cout << endl;
+				cout << endl; */
 				
 				// CALCOLO LE DISTANZE DEI POSSIBILI PERCORSI PER TUTTI I VALORI DI Kvicini
 				vector<Soluzione*> percorsi;
@@ -133,9 +134,9 @@ void MioSolver::risolvi(int start){
 				// SCELTA DEL PUNTO MIGLIORE DOPO IL QUALE INSERIRE IL PROSSIMO PUNTO (daAggiungere)
 				int migliorPunto = 0;				// indica la posizione in Kvicini dove trovare il miglior punto
 				double migliorValore = percorsi[0]->getFO();
-				cout << " Valore percorso temporaneo con il punto "<<Kvicini[0]<<" ==> "<< percorsi[0]->getFO() <<endl;
+				// cout << " Valore percorso temporaneo con il punto "<<Kvicini[0]<<" ==> "<< percorsi[0]->getFO() <<endl;
 				for (int j=1; j<K; j++){
-					cout << " Valore percorso temporaneo con il punto "<<Kvicini[j]<<" ==> "<< percorsi[j]->getFO() <<endl;
+					// cout << " Valore percorso temporaneo con il punto "<<Kvicini[j]<<" ==> "<< percorsi[j]->getFO() <<endl;
 					if (percorsi[j]->getFO()<migliorValore){
 						migliorPunto = j;
 						migliorValore = percorsi[j]->getFO();
@@ -144,7 +145,7 @@ void MioSolver::risolvi(int start){
 				if (migliorValore == 0)
 					throw runtime_error(" Errore nel calcolo del sotto-percorso migliore! "); 
 				else 
-					cout << " Miglior valore percorso temporaneo per ora: " << migliorValore <<endl;
+					// cout << " Miglior valore percorso temporaneo per ora: " << migliorValore <<endl;
 					
 				// CANCELLO LE SOLUZIONI AGGIUNTIVE CREATE
 				for (int j=0; j<percorsi.size(); j++)
@@ -157,7 +158,7 @@ void MioSolver::risolvi(int start){
 				ordinati.insert(it, daAggiungere);
 				giainseriti.push_back(ilminore);
 				ultimoinserito = ilminore;
-				cout << " Inserito il punto di indice "<< i <<" subito dopo il punto di indice "<< Kvicini[migliorPunto] <<endl;
+				// cout << " Inserito il punto di indice "<< i <<" subito dopo il punto di indice "<< Kvicini[migliorPunto] <<endl;
 				}
 			
 			}
@@ -176,11 +177,11 @@ void MioSolver::risolvi(int start){
 		else
 			cout << " Problema risolto in "<< tempo <<" clocks ("<< tempoRisoluzione <<" secondi)"<< endl;
 		
-		cout << " Valore funzione obiettivo: " << valoreFO << endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
+		cout << " Valore funzione obiettivo per MioSolver: " << valoreFO << endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
 		
 	}
 	catch (std::exception& e) {
-		cout << ">>> Eccezione durante l'esecuzione del Mio Solver: " << e.what() << endl;
+		cout << ">>> Eccezione durante l'esecuzione del Mio Solver: " << e.what() << endl<<endl;
 	}
 	//if (verbose) cout << " Problema risolto con il MioSolver! \n";
 }

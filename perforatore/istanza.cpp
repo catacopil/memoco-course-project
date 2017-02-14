@@ -9,7 +9,7 @@
 #include <vector>
 #include <math.h>
 
-bool Istanza::verbose = true;
+bool Istanza::verbose = false;
 
 Istanza::Istanza(int numeroNodi = 10){			// costruttore di default oppure costruttore di istanze casuali
 	N = numeroNodi;

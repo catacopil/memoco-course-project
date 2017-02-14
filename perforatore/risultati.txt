@@ -1,0 +1,52 @@
+
+Per l'istanza istanzaG57.txt:
+
+	-------  RISULTATI FINALI  -------- 
+
+	 Il minimo per CPLEX è: 563.286
+	 Il minimo per Nearest Neighbor è: 635.802
+	 Il minimo per Mio Solver è: 581.626
+	 Il minimo per TwoOpt Solver è: 577.28
+
+
+Per l'istanza istanzaG90.txt
+	 -------  RISULTATI FINALI  -------- 
+
+	 Il minimo per CPLEX è: 949.879			(387 secondi)
+	 Il minimo per Nearest Neighbor è: 1016.23
+	 Il minimo per Mio Solver è: 1005.97
+	 Il minimo per TwoOpt Solver è: 964.765  	(0.000756 secondi)
+
+===> ./perforatore 3000
+	 -------  RISULTATI FINALI  -------- 
+
+	 Il minimo per Nearest Neighbor è: 50175.9 in 3.7935 secondi
+	 Il minimo per Mio Solver è: 50493.1 in 9.39158 secondi
+	 Il minimo per TwoOpt Solver è: 50090.6 in 4.23864 secondi
+
+
+===> ./perforatore 4000
+	 -------  RISULTATI FINALI  -------- 
+
+	 Il minimo per Nearest Neighbor è: 58521.4 in 8.97279 secondi
+	 Il minimo per Mio Solver è: 58191.7 in 19.1931 secondi						// WHAT?! Il mio è il migliore!!
+	 Il minimo per TwoOpt Solver è: 58503.5 in 8.81547 secondi
+
+
+===> ./perforatore 5000
+	 -------  RISULTATI FINALI  -------- 
+
+	 Il minimo per Nearest Neighbor è: 63130.3 in 17.3507 secondi
+	 Il minimo per Mio Solver è: 65135.8 in 34.4548 secondi
+	 Il minimo per TwoOpt Solver è: 63128.5 in 17.4937 secondi
+
+
+===>   ./perforatore 6000
+	 -------  RISULTATI FINALI  -------- 
+
+	 Il minimo per Nearest Neighbor è: 68193.3 in 29.3196 secondi
+	 Il minimo per Mio Solver è: 70623.5 in 55.8215 secondi
+	 Il minimo per TwoOpt Solver è: 68193.3 in 31.9793 secondi
+
+
+===> 

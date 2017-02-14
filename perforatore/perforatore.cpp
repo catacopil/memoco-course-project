@@ -12,6 +12,7 @@
 #include "CPLEXsolver.h"
 #include "Nearsolver.h"
 #include "Miosolver.h"
+#include "TwoOptSolver.h"
 
 using namespace std;
 
@@ -62,20 +63,23 @@ int main(int argc, char const *argv[]) {
 	
 	string nomeFileIst = "Ist_JSON";
 	nomeFileIst = nomeFileIst+to_string(ist->getN())+".txt";
-	ist->toFileJSON(nomeFileIst);
-	ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
+	//ist->toFileJSON(nomeFileIst);
+	//ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
 	
 	CPLEX_Solver* CPX = new CPLEX_Solver(ist, env, lp);
 	//CPX->risolvi();
 	
+	// TODO: da notare il fatto che iniziare dal punto 0 o 3 o 5 cambia abbastanza le cose
+	int START = 38;
+	
 	NearSolver* NS = new NearSolver(ist);
-	NS->risolvi(3);
+	MioSolver* MIO = new MioSolver(ist,50);
+	TwoOptSolver* TWO = new TwoOptSolver(ist);
 	
 	Soluzione* solInteressante;
 	Soluzione* solMia;
 	
 	
-	MioSolver* MIO = new MioSolver(ist,ist->getN());
 	double minimoMio = 1000000000;
 	int maxProve = 30;
 	/*for (int i=0; i<maxProve; i++){
@@ -84,28 +88,49 @@ int main(int argc, char const *argv[]) {
 			minimoMio = MIO->getFO();
 			}
 	}*/
-	MIO->risolvi(0);
 	
+	double minNS = 1000000000;
+	double minMIO = 1000000000;
+	double minTWO = 1000000000;
+	double minTWOtempo;
+	int recordSTART = START;
 	
-	solInteressante = NS->getSoluzione();
-	solMia = MIO->getSoluzione();
+	for (START=0; START<ist->getN(); START++){
+		//NS->risolvi(START);
+		//MIO->risolvi(START);
+		TWO->risolvi(START);
+		//if (NS->getFO()<minNS) minNS = NS->getFO();
+		//if (MIO->getFO()<minMIO) minMIO = MIO->getFO();
+		if (TWO->getFO()<minTWO) {
+			minTWO = TWO->getFO();
+			minTWOtempo = TWO->getTempoRisoluzione();
+			recordSTART = START;
+			}
+		/*
+		cout << " Il minimo per Nearest Neighbor è: "<< NS->getFO() << " [partenza: "<<START<<"]"<< endl;
+		cout << " Il minimo per Mio Solver è: "<< MIO->getFO() << " [partenza: "<<START<<"]"<< endl;
+		cout << " Il minimo per TwoOpt Solver è: "<< TWO->getFO() << " [partenza: "<<START<<"]"<< endl<<endl;
+		*/
+		} 
+	//solInteressante = NS->getSoluzione();
+	//solMia = MIO->getSoluzione();
 
-	solInteressante->toFileJSON("util/disegno istanze/solNearest.txt");
-	solMia->toFileJSON("util/disegno istanze/solMia.txt");
+	//solInteressante->toFileJSON("util/disegno istanze/solNearest.txt");
+	//solMia->toFileJSON("util/disegno istanze/solMia.txt");
 	
-	
-	cout << " Il minimo per CPLEX è: "<< CPX->getFO() << endl;
-//	cout << " Il minimo per Mio Solver è: "<< minimoMio << endl;
-	cout << " Il minimo per Mio Solver è: "<< MIO->getFO() << " [partenza: 0]"<< endl;
-	cout << " Il minimo per Nearest Neighbor è: "<< NS->getFO() << " [partenza: 0]"<< endl;
-	
+	cout << "\n\n -------  RISULTATI FINALI  -------- \n\n";
+	cout << " Il minimo per CPLEX è: "<< CPX->getFO() << " in "<<CPX->getTempoRisoluzione()<< " secondi " << endl;
+	cout << " Il minimo per Mio Solver è: "<< minimoMio << endl;
+	cout << " Il minimo per Nearest Neighbor è: "<< minNS << " in " << NS->getTempoRisoluzione() << " secondi" << endl;
+	cout << " Il minimo per Mio Solver è: "<< minMIO << " in " << MIO->getTempoRisoluzione() << " secondi" << endl;
+	cout << " Il minimo per TwoOpt Solver è: "<< minTWO << " in " << TWO->getTempoRisoluzione() << " secondi [start: "<<recordSTART<<"]" << endl;
 	
 	
 	
 	
 	
 	// CANCELLA OGGETTI DALLO STACK
-	delete CPX;
+	//delete CPX;
 	delete NS;
 	delete MIO;
 	delete sol;
