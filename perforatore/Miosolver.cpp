@@ -19,6 +19,11 @@ MioSolver::MioSolver(Istanza* i, int kappa):Solver(i),maxK(kappa){
 	if (verbose) cout << " MioSolver creato per l'istanza richiesta \n";
 }
 
+MioSolver::~MioSolver(){
+//  -------	DISTRUTTORE
+	delete distanze;
+}
+
 
 void MioSolver::risolvi(int start){	
 //  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
@@ -32,7 +37,7 @@ void MioSolver::risolvi(int start){
 		int ilminore = 0;
 		int numeroNodi = ist->getN();
 		cout << "\n Inizia l'esecuzione del MioSolver...." << endl;
-		clock_t tempo = clock();
+		chrono::high_resolution_clock::time_point inizio = chrono::high_resolution_clock::now();
 		
 		ordinati.push_back((*nodiIstanza)[ultimoinserito]); 				// inserisco il primo
 		giainseriti.push_back(start);
@@ -144,8 +149,6 @@ void MioSolver::risolvi(int start){
 					}
 				if (migliorValore == 0)
 					throw runtime_error(" Errore nel calcolo del sotto-percorso migliore! "); 
-				else 
-					// cout << " Miglior valore percorso temporaneo per ora: " << migliorValore <<endl;
 					
 				// CANCELLO LE SOLUZIONI AGGIUNTIVE CREATE
 				for (int j=0; j<percorsi.size(); j++)
@@ -167,15 +170,17 @@ void MioSolver::risolvi(int start){
 		valoreFO = sol->getFO();
 		
 		// calcolo del tempo impiegato
-		tempo = clock() - tempo;
-		tempoRisoluzione = ((float)tempo/CLOCKS_PER_SEC);
+		chrono::high_resolution_clock::time_point fine = chrono::high_resolution_clock::now();
+		auto duration = chrono::duration_cast<chrono::milliseconds>(fine - inizio);
+		double millisec = duration.count();
+		tempoRisoluzione = millisec/1000;
 		if (tempoRisoluzione >= 60.0){
 			int minuti = tempoRisoluzione/60;
 			double secondi = fmod(tempoRisoluzione, 60);
-			cout << " Problema risolto in "<< tempo <<" clocks ("<< minuti <<" minuti e "<< secondi <<" secondi)"<< endl;
+			cout << " Problema risolto in "<< minuti <<" minuti e "<< secondi <<" secondi"<< endl;
 			}
 		else
-			cout << " Problema risolto in "<< tempo <<" clocks ("<< tempoRisoluzione <<" secondi)"<< endl;
+			cout << " Problema risolto in "<< tempoRisoluzione <<" secondi"<< endl;
 		
 		cout << " Valore funzione obiettivo per MioSolver: " << valoreFO << endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
 		

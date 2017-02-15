@@ -18,7 +18,6 @@ Solver::Solver(Istanza* i){
 
 Solver::Solver(Istanza* i, Soluzione* s){
 // ---------	COSTRUTTORE ISTANZA E SOLUZIONE ESISTENTE
-// TODO: 	HA SENSO QUESTO COSTRUTTORE? Ha senso creare un solver con già una soluzione?
 	ist = i;
 	sol = s;
 	if (verbose) cout << " Solver creato per l'istanza richiesta con la soluzione passata \n";

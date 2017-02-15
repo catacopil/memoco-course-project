@@ -50,3 +50,19 @@ Per l'istanza istanzaG90.txt
 
 
 ===> 
+
+
+===>> QUELLA VOLTA CHE IL MIO HA FATTO MEGLIO:
+	-------  RISULTATI FINALI  -------- 
+
+	 Il minimo per Nearest Neighbor è: 21539.1 in 0.056862 secondi [start: 0]
+	 Il minimo per Mio Solver è: 21195.3 in 0.155786 secondi [start: 0]
+	 Il minimo per TwoOpt Solver è: 18383.5 in 0.042705 secondi [start: 0]
+	 
+	 -------  RISULTATI FINALI  -------- 
+
+	 Il minimo per Nearest Neighbor è: 21698.8 in 0.056891 secondi [start: 0]
+	 Il minimo per Mio Solver è: 21057.1 in 0.154239 secondi [start: 0]
+	 Il minimo per TwoOpt Solver è: 18135.8 in 0.047153 secondi [start: 0]
+
+

@@ -27,31 +27,31 @@ CPLEX_Solver::CPLEX_Solver(Istanza* i, CEnv e, Prob prob):Solver(i), ENV(e), LP(
 	if (verbose) cout << " Solver CPLEX creato per l'istanza richiesta \n";
 }
 
-CPLEX_Solver::~CPLEX_Solver(){	// TODO: ha senso il distruttore esplicito ?? Non distrugge niente
+CPLEX_Solver::~CPLEX_Solver(){
+//  -------	DISTRUTTORE
 	if (verbose) cout << " Distrutto Solver CPLEX ";
 }
 
 void CPLEX_Solver::risolvi(){	
 //  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
-// TODO: DA RITORNARE UN OGGETTO Soluzione*  -----> meglio fare un metodo a parte per questo
 	try{
-		cout << " Inizia l'esecuzione del solver...." << endl;
-		clock_t tempo = clock();
-		std::chrono::high_resolution_clock::time_point inizio = std::chrono::high_resolution_clock::now();
+		cout << " Inizia l'esecuzione del solver CPLEX.... buona attesa ^_^ " << endl;
+		
+		chrono::high_resolution_clock::time_point inizio = std::chrono::high_resolution_clock::now();
 		CHECKED_CPX_CALL(CPXmipopt, ENV, LP);									// esecuzione del solver
-		tempo = clock() - tempo;
-		tempoRisoluzione = ((float)tempo/CLOCKS_PER_SEC);
-		std::chrono::high_resolution_clock::time_point fine = std::chrono::high_resolution_clock::now();
+		
+		chrono::high_resolution_clock::time_point fine = std::chrono::high_resolution_clock::now();
 		//secondi duration = fine - inizio;
-		auto duration = std::chrono::duration_cast<std::chrono::seconds>(fine - inizio);
-		//tempoRisoluzione = duration/1000;
-		/*if (tempoRisoluzione >= 60.0){
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(fine - inizio);
+		unsigned int millisec = duration.count();
+		tempoRisoluzione = millisec/1000;
+		if (tempoRisoluzione >= 60.0){
 			int minuti = tempoRisoluzione/60;
 			double secondi = fmod(tempoRisoluzione, 60);
-			cout << " Problema risolto in "<< tempo <<" clocks ("<< minuti <<" minuti e "<< secondi <<" secondi)"<< endl;
+			cout << " Problema risolto in "<< minuti <<" minuti e "<< secondi <<" secondi"<< endl;
 			}
-		else */
-			cout << " Problema risolto in "<< tempo <<" clocks ("<< duration.count() <<" secondi)"<< endl;
+		else
+			cout << " Problema risolto in "<< tempoRisoluzione <<" secondi"<< endl;
 		
 		CHECKED_CPX_CALL(CPXgetobjval, ENV, LP, &valoreFO);
 
@@ -81,8 +81,7 @@ Soluzione* CPLEX_Solver::getSoluzione(){
 
 void recuperaSoluzione(){
 //  ---------	GENERA UN OGGETTO SOLUZIONE, RECUPERANDO I DATI DALLA SOLUZIONE DI CPLEX
-//	TODO: da implementare per poter fare i disegni del percorso scelto (se richiede meno dell'attività manuale)
-
+//	TODO: da implementare 
 	return;
 }
 
@@ -162,7 +161,7 @@ void CPLEX_Solver::setupLP() {
     int matbeg1 = 0;
     for (int i = 0; i < idx1.size(); i++){
     		idx1[i] = 
-		idx1[i] = i+((nodoStart+1)*(N-1)-N+1);            //TODO: perché non uso le matrici per recuperare gli indici
+		idx1[i] = i+((nodoStart+1)*(N-1)-N+1);  
 	}
 	double terminiNoti[1] = {N};
 	CHECKED_CPX_CALL( CPXaddrows, ENV, LP, 0, 1, idx1.size(), terminiNoti, &sense1, &matbeg1, &idx1[0], &coef1[0], NULL , NULL );

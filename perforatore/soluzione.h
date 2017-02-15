@@ -32,14 +32,13 @@ public:
 	
 	string toFileJSON(string);						// esporta in un file di testo la soluzione in formato JSON 
 	
-//	bool checkAmmissibile();							// controlla se la soluzione è ammissibile (cioè se contiene un ciclo Hamiltoniano, senza sottocicli)
 
 private:
 	int N;
 	double FO;
 	Istanza* ist;
 	vector<Punto> ordinati;							// contiene i nodi dell'istanza (lista di punti) 
-	double calcolaFO();
+	double calcolaFO();								// calcola la funzione obiettivo della soluzione, cioè la distanza tra tutti i nodi seguendo il loro ordine (compreso la distanza dall'ultimo dal primo --> ritorno al punto di partenza )
 
 };
 

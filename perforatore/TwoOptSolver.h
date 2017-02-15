@@ -11,12 +11,11 @@
 #include <iostream>
 #include <string>
 #include <math.h>
-#include <time.h>
+#include <chrono>
 #include <float.h>
 #include <algorithm>
 #include "solver.h"
 #include "punto.h"
-#include "segmento.h"
 
 using namespace std;
 
@@ -25,26 +24,25 @@ class TwoOptSolver: public Solver{
 public:
 	static bool verbose;								// indica se stampare sulla console messaggi di log sull'avanzamento del programma
 
-	TwoOptSolver(Istanza*);								// Creazione del solver, collegandolo con l'oggetto Istanza che deve risolvere, viene passato anche il parametro K
+	TwoOptSolver(Istanza*, int);							// Creazione del solver, collegandolo con l'oggetto Istanza che deve risolvere, richiede il numero massimo di miglioramenti desiderato (di default è 1000)
 	
 	void risolvi(int);									// risolve il problema utilizzando l'euristica Nearest Neighbor e poi ottimizza utilizzando un determinato numero di azioni 2-opt
 	Soluzione* getSoluzione();							// ritorna la Soluzione
 	double getTempoRisoluzione();							// ritorna il tempo (in secondi) impiegato per la risoluzione, se non ancora risolto ritorna -1
 	double getFO();									// ritorna il valore della Funzione Obiettivo, se non ancora risolto ritorna -1
 	
-// 	~MioSolver();		TODO: SERVE ??
+ 	~TwoOptSolver();
 
 private:
 	double tempoRisoluzione;
 	double valoreFO;
-	vector<Punto> nuovoPercorso;
+	const int maxOpt;									// il massimo per di miglioramenti desiderati
+	vector<Punto> ordinati;								// vector di punti utilizzato per ordinare i nodi dell'istanza
 	vector<vector<double>>* distanze;						// matrice delle distanze
-	vector<Segmento>* segmentiSoluzione;					// contiene i segmenti dell'attuale soluzione
-	void costruisciSegmenti(vector<Punto>&);							// popola il vector segmentiSoluzione
-	double mediaSegmenti();								// calcola la lunghezza media dei segmenti
+	
 	bool two_opt(int, int);								// Tentativo di 2-opt per 2 segmenti trovati
-	double calcolaTotSegmenti();							// Calcola la FO sommando le lunghezze dei segmenti attuali
-	void stampaSegmenti();								// stampa a video gli oggetti di segmentiSoluzione
+	void switch_two_opt(int, int);						// Esegue l'operazione 2-opt per i 2 segmenti 
+
 };
 
 

@@ -1,3 +1,5 @@
+
+
 #include "punto.h"
 
 Punto::Punto(int posx=-1, int posy=-1):x(posx),y(posy){			// creazione punto standard

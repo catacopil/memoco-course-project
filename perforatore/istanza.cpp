@@ -25,7 +25,7 @@ Istanza::Istanza(int numeroNodi = 10){			// costruttore di default oppure costru
 			for (int s=0; s<arr_nodi.size() && not trovato; s++)
 				trovato = (arr_nodi[s]==nuovo);
 			if (trovato){
-				cout<< " !! Punto già presente: " << nuovo.stampa()<<endl;
+				if (verbose) cout<< " !! Punto già presente: " << nuovo.stampa()<<endl;
 				nuovo = Punto(distribution(mt_generator),distribution(mt_generator));
 				}
 			}
@@ -44,7 +44,7 @@ Istanza::Istanza(string nomeFile){				// costruttore che legge l'istanza da un f
 	
      // INIZIO LETTURA PUNTI
      try{
-	if (verbose) 	cout << "Inizio lettura punti" << endl;
+	if (verbose) cout << "Inizio lettura punti" << endl;
 	lettorePunti.open(nomeFile);
 	char* in = new char[100];
 	lettorePunti.getline(in,100);					// leggo la prima riga per capire quanti nodi ha l'istanza

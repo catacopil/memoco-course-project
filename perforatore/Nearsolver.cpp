@@ -19,6 +19,11 @@ NearSolver::NearSolver(Istanza* i):Solver(i){
 	if (verbose) cout << " Solver Nearest Neighbor creato per l'istanza richiesta \n";
 }
 
+NearSolver::~NearSolver(){
+//  ------	DISTRUTTORE
+	delete distanze;
+}
+
 
 void NearSolver::risolvi(int start){	
 //  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
@@ -32,7 +37,7 @@ void NearSolver::risolvi(int start){
 		int ilminore = 0;
 		int numeroNodi = ist->getN();
 		cout << "\n Inizia l'esecuzione del NearSolver...." << endl;
-		clock_t tempo = clock();
+		chrono::high_resolution_clock::time_point inizio = chrono::high_resolution_clock::now();
 		
 		ordinati.push_back((*nodiIstanza)[ultimoinserito]); 				// inserisco il primo
 		giainseriti.push_back(start);
@@ -64,18 +69,19 @@ void NearSolver::risolvi(int start){
 		sol = new Soluzione(ist, &ordinati);
 		valoreFO = sol->getFO();
 		
-		
-		tempo = clock() - tempo;
-		tempoRisoluzione = ((float)tempo/CLOCKS_PER_SEC);
+		chrono::high_resolution_clock::time_point fine = chrono::high_resolution_clock::now();
+		auto duration = chrono::duration_cast<chrono::milliseconds>(fine - inizio);
+		double millisec = duration.count();
+		tempoRisoluzione = millisec/1000;
 		if (tempoRisoluzione >= 60.0){
 			int minuti = tempoRisoluzione/60;
 			double secondi = fmod(tempoRisoluzione, 60);
-			cout << " Problema risolto in "<< tempo <<" clocks ("<< minuti <<" minuti e "<< secondi <<" secondi)"<< endl;
+			cout << " Problema risolto in "<< minuti <<" minuti e "<< secondi <<" secondi"<< endl;
 			}
 		else
-			cout << " Problema risolto in "<< tempo <<" clocks ("<< tempoRisoluzione <<" secondi)"<< endl;
+			cout << " Problema risolto in "<< tempoRisoluzione <<" secondi"<< endl;
 		
-		cout << " Valore funzione obiettivo: " << valoreFO << " [start: "<< start <<"]"<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
+		cout << " Valore funzione obiettivo: " << valoreFO << " [start: "<< start <<"]"<<endl;		// stampa il valore della funzione obiettivo per la soluzione ottima
 		
 	}
 	catch (std::exception& e) {

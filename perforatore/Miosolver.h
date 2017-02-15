@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
-#include <time.h>
+#include <chrono>
 #include <float.h>
 #include <algorithm>
 #include "solver.h"
@@ -31,12 +31,12 @@ public:
 	double getTempoRisoluzione();							// ritorna il tempo (in secondi) impiegato per la risoluzione, se non ancora risolto ritorna -1
 	double getFO();									// ritorna il valore della Funzione Obiettivo, se non ancora risolto ritorna -1
 	
-// 	~MioSolver();		TODO: SERVE ??
+ 	~MioSolver();
 
 private:
 	double tempoRisoluzione;
 	double valoreFO;
-	const int maxK;
+	const int maxK;									// massimo K da utilizzare 
 	vector<vector<double>>* distanze;
 };
 

@@ -1,5 +1,5 @@
 /*
-*	Implementazione della classe NearSolver
+*	Implementazione della classe TwoOptSolver
 *
 */
 
@@ -10,13 +10,18 @@
 
 bool TwoOptSolver::verbose = true;
 
-TwoOptSolver::TwoOptSolver(Istanza* i):Solver(i){
+TwoOptSolver::TwoOptSolver(Istanza* i, int M=1000):Solver(i),maxOpt(M){			// il numero massimo di miglioramenti richiesti di default è 1000
 //  -------	COSTRUTTORE SEMPLICE
 	tempoRisoluzione = -1.0;
 	valoreFO = -1.0;
 	distanze = ist->getDistanze();
 	
-	if (verbose) cout << " Solver TwoOpt creato per l'istanza richiesta \n";
+	if (verbose) cout << " Solver TwoOpt creato per l'istanza di richiesta \n";
+}
+
+TwoOptSolver::~TwoOptSolver(){
+//  -------	DISTRUTTORE 
+	delete distanze;	// elimino la matrice delle distanze
 }
 
 
@@ -27,12 +32,12 @@ void TwoOptSolver::risolvi(int start){
 		vector<int> giainseriti;
 		vector<vector<double>>* distanze = ist->getDistanze();
 		vector<Punto>* nodiIstanza = ist->getNodi();
-		vector<Punto> ordinati;
 		int ultimoinserito = start;
 		int ilminore = 0;
 		int numeroNodi = ist->getN();
 		cout << "\n Inizia l'esecuzione del Solver TwoOpt...." << endl;
-		clock_t tempo = clock();
+		chrono::high_resolution_clock::time_point inizio = std::chrono::high_resolution_clock::now();
+		
 		
 		ordinati.push_back((*nodiIstanza)[ultimoinserito]); 				// inserisco il primo
 		giainseriti.push_back(start);
@@ -57,99 +62,48 @@ void TwoOptSolver::risolvi(int start){
 			ordinati.push_back((*nodiIstanza)[ilminore]);
 			giainseriti.push_back(ilminore);
 			ultimoinserito = ilminore;
-			
-		}
-		// NUOVO METODO PER LA GESTIONE DI TWO-OPT
-		// creo la mia lista di punti ordinati
-		nuovoPercorso = ordinati;
+		}		
+
 		// ciclo esterno per il numero di iterazioni che voglio
-		/*int count = 0;
-		while (count < 1000){
+		int count = 0;
+		bool trovato = true;
+		while (count < maxOpt && trovato){
 			// cerco 2 punti per il tentativo di 2opt 
-			// TODO: da sistemare il range di movimento
-			for (int i=0; i<nuovoPercorso.size()-1; i++)
-				for (int j=i+1; j<nuovoPercorso.size()-1; j++){
+			trovato = false;
+			for (int i=0; i<ordinati.size()-1; i++)
+				for (int j=i+1; j<ordinati.size()-1; j++){
+					if (i==j || j==i+1 || i==j+1) continue;
+					
 					// provo a vedere se la 2opt porterebbe benefici
 					if (two_opt(i,j)){
-						
+						trovato = true;
+						// se funziona allora faccio lo switch e modifico l'ordine dei punti di mezzo, incremento count anche
+						switch_two_opt(i,j);
+						count++;
 						}
-					
-					// se funziona allora faccio lo switch e modifico l'ordine dei punti di mezzo, incremento count anche 
-					
-					
-					// sistemo gli indici i e j ? ha senso
-					
-					
 					}
 			}
-		*/
-		
-		costruisciSegmenti(ordinati);
-		double FOiniziale = calcolaTotSegmenti();
-		cout << " FOiniziale = "<<FOiniziale<<endl;
-		double media = mediaSegmenti();
-		cout << " Media = "<<media;
-		media = media - (media/3);		// abbasso la media richiesta
-		media = 0.1;
-		cout << " ---> Media = "<<media<<endl;
-		
-		// costruisco vector contenente i segmenti lunghi più della media
-		vector<Segmento> lunghi;
-		for (int j=0; j<segmentiSoluzione->size(); j++)
-			if ((*segmentiSoluzione)[j].getLunghezza()>media)
-				lunghi.push_back((*segmentiSoluzione)[j]);
-		cout << " Creato vector con segmenti più lunghi: "<<lunghi.size()<<" segmenti rispetto al totale di "<< segmentiSoluzione->size() <<endl;
-		// considero le possibili 2opt per 10 coppie di segmenti lunghi 
-		int count = 0;
-		int s1 = 0;
-		int s2 = 0;			// prendo i segmenti normali
-		bool fermati = false;
-		for (int i=0; !fermati && (count<1000); i++){
-			
-			
-			if (s1!=s2 && two_opt(s1, s2)){
-				count++;
-				cout << " count: "<< count <<endl;
-				stampaSegmenti();
-				}
-			if (s2<segmentiSoluzione->size())
-				s2++;
-			else{
-				if (s1<lunghi.size())
-					s1++;
-				else{
-					fermati = true;			// fermo la ricerca di 2opt
-					cout << " Ho provato tutte le possibili 2opt! "<<endl;
-					}
-				s2 = s1+1;
-				}
-			
-		}
-		
-		valoreFO = calcolaTotSegmenti();
-		
-		
-		
-		
-		
-		
+		if (verbose) cout << " Eseguite "<< count << " two-opt";
+		if (!trovato)
+			if (verbose) cout << " Non ho più trovato miglioramenti !"<<endl;
 		
 		// creo oggetto Soluzione e aggiorno la funzione obiettivo
-		//sol = new Soluzione(ist, &ordinati); TODO: da sistemare qua la Soluzione
-		//valoreFO = sol->getFO();
+		sol = new Soluzione(ist, &ordinati);
+		valoreFO = sol->getFO();
 		
-		
-		tempo = clock() - tempo;
-		tempoRisoluzione = ((float)tempo/CLOCKS_PER_SEC);
+		chrono::high_resolution_clock::time_point fine = chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<chrono::milliseconds>(fine - inizio);
+		double millisec = duration.count();
+		tempoRisoluzione = millisec/1000;
 		if (tempoRisoluzione >= 60.0){
 			int minuti = tempoRisoluzione/60;
 			double secondi = fmod(tempoRisoluzione, 60);
-			cout << "\n Problema risolto in "<< tempo <<" clocks ("<< minuti <<" minuti e "<< secondi <<" secondi)"<< endl;
+			cout << " Problema risolto in "<< minuti <<" minuti e "<< secondi <<" secondi"<< endl;
 			}
 		else
-			cout << "\n Problema risolto in "<< tempo <<" clocks ("<< tempoRisoluzione <<" secondi)"<< endl;
+			cout << " Problema risolto in "<< tempoRisoluzione <<" secondi"<< endl;
 		
-		cout << " Valore funzione obiettivo per TwoOptSolver: " << valoreFO << " [start: "<< start <<" | count:"<< count <<"]"<<endl<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
+		cout << " Valore funzione obiettivo per TwoOptSolver: " << valoreFO << " [start: "<< start <<" | count 2-opt:"<< count <<"]"<<endl<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
 		
 	}
 	catch (std::exception& e) {
@@ -158,84 +112,51 @@ void TwoOptSolver::risolvi(int start){
 	//cout << " Problema risolto con il Solver Nearest Neighbor! \n";
 }
 
-void TwoOptSolver::costruisciSegmenti(vector<Punto> &ordinati){
-	segmentiSoluzione = new vector<Segmento>;
-	for (int i=0; i<ordinati.size(); i++){				// scorro tutti i Punti della soluzione inserendo per ciascuno di essi un segmento
-		Punto A = ordinati[i];
-		Punto B = A;
-		if (i!=ordinati.size()-1)			// vedo se c'è il prossimo, altrimenti prendo il Punto iniziale
-			B = ordinati[i+1];
-		else 
-			B = ordinati[0];
-		segmentiSoluzione->push_back(Segmento(A,B));
-		}
-}
-
-double TwoOptSolver::mediaSegmenti(){
-//  --------	RITORNA LA LUNGHEZZA MEDIA DEI SEGMENTI
-	double m = 0;
-	for (int i=0; i<segmentiSoluzione->size(); i++)
-		m += (*segmentiSoluzione)[i].getLunghezza();
-	return m/segmentiSoluzione->size();
-}
-
 
 bool TwoOptSolver::two_opt(int p1, int p2){
 // ------- 	VERIFICA SE L'OPERAZIONE È FATTIBILE E PORTA UN MIGLIORAMENTO  (nuova versione)
 	// p1 e p2 sono rispettivamente gli indici di nuovoPercorso e indicano 2 possibili punti A e C, tali che AB e CD possono essere sostituiti con AC e BD
 	bool successo = false;
-	/*
-	Punto A = nuovoPercorso[p1];
-	Punto B = nuovoPercorso[p1+1];
-	Punto C = nuovoPercorso[p2];
-	Punto D = nuovoPercorso[p2+1];
-	*/
-
-//  --------	TENTA L'OPERAZIONE 2OPT SUI DUE SEGMENTI  (se l'operazione ha successo ritorna true altrimenti false)
-	//if (verbose) 	cout << " Tentativo 2opt per segmenti "<<s1<< " e "<<s2<<endl;
 	
-	Segmento seg1 = (*segmentiSoluzione)[s1];
-	Segmento seg2 = (*segmentiSoluzione)[s2];
-	Punto A = seg1.getDa();
-	Punto B = seg1.getA();
-	Punto C = seg2.getDa();
-	Punto D = seg2.getA();
+	Punto A = ordinati[p1];
+	Punto B = ordinati[p1+1];
+	Punto C = ordinati[p2];
+	Punto D = ordinati[p2+1];
 	
-	// controllo che non vengano generati segmenti con agli estremi gli stessi punti (sarebbe un cappio)
 	if (A==C || B==D)
 		return false;
 	
+	double attualeDist = A.distanza(&B) + C.distanza(&D);
 	double nuovaVariante = A.distanza(&C) + B.distanza(&D);
-	if (nuovaVariante < (seg1.getLunghezza()+seg2.getLunghezza())){
+	
+	if (nuovaVariante < attualeDist){
 		successo = true;
-		// inserisco i due nuovi segmenti al posto degli altri
-		(*segmentiSoluzione)[s1] = Segmento(A,C);
-		(*segmentiSoluzione)[s2] = Segmento(B,D);
-		
-		if (verbose) cout << " Eseguita operazione 2-opt per i segmenti di indice "<< s1 <<" e "<< s2 <<endl;
-		
-		
-		// cambio di "direzione" i segmenti compresi tra gli indici s1 e s2 (questo garantisce che i nuovi segmenti siano composti sempre da AC e BD)
-		// assumo che s1<s2 sempre!
-		for (int i=s1+1; i<s2; i++){
-			(*segmentiSoluzione)[i].gira();
-			cout << " Giro seg "<<i<<" \t";
-			}
+		//if (verbose) cout << " Trovata 2opt per i punti " << p1 << " e "<< p2 << endl;
 		}
 	return successo;
 }
 
-
-double TwoOptSolver::calcolaTotSegmenti(){
-	double tot = 0.0;
-	for (int i=0; i<segmentiSoluzione->size(); i++)
-		tot += (*segmentiSoluzione)[i].getLunghezza();
-	return tot;
-}
-
-void TwoOptSolver::stampaSegmenti(){
-	for (int i=0; i<segmentiSoluzione->size(); i++)
-		cout << "["<< i <<"]"<< (*segmentiSoluzione)[i].stampa()<<endl;
+void TwoOptSolver::switch_two_opt(int i, int j){
+// -------	ESEGUE LA TWO-OPT SUI NODI DEGLI INDICI PASSATI E SISTEMA L'ORDINE DEI NODI INTERMEDI
+	// assumo che i<j sempre!
+	if (i>=j)
+		throw runtime_error(" Errore durante lo switch di due Punti in Two-Opt ----> i>=j! "); 
+	int puntoA = i;
+	int puntoB = i+1;
+	int puntoC = j;
+	int puntoD = j+1;
+	vector<Punto> temp;
+	Punto t = ordinati[puntoB];						// scambio i punti interessati (sarebbero B e C)
+	ordinati[puntoB] = ordinati[puntoC];
+	ordinati[puntoC] = t;
+	
+	// inverto l'ordine per i punti compresi tra puntoB e puntoC
+	vector<Punto>::iterator it;
+ 	it = temp.begin();
+	for (int k = puntoB+1; k<puntoC; k++)
+		it = temp.insert(it, ordinati[k]);				// inserisco sempre in testa, in questo modo inverto l'ordine
+	for (int k=0; k<temp.size(); k++)
+		ordinati[puntoB+1+k] = temp[k];
 }
 
 

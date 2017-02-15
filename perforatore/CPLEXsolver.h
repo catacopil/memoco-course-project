@@ -11,7 +11,6 @@
 #include <iostream>
 #include <string>
 #include <math.h>
-#include <time.h>
 #include <chrono>
 #include "cpxmacro.h"
 #include "solver.h"
@@ -26,7 +25,7 @@ public:
 	CPLEX_Solver(Istanza*, CEnv, Prob);								// Solver creato di default per un'istanza ---> crea una Soluzione di default
 	
 	void risolvi();
-	Soluzione* getSoluzione();							// ritorna la Soluzione (quella di default per adesso ---> TODO: da sistemare)
+	Soluzione* getSoluzione();							// ritorna la Soluzione (ritorna quella di default per adesso ---> TODO: da sistemare)
 	double getTempoRisoluzione();							// ritorna il tempo (in secondi) impiegato per la risoluzione, se non ancora risolto ritorna -1
 	double getFO();									// ritorna il valore della Funzione Obiettivo, se non ancora risolto ritorna -1
 	
