@@ -33,16 +33,18 @@ int main(int argc, char const *argv[]) {
 	string fileName;						// nome del file che contiene l'istanza del problema
 	ifstream lettoreIstanza;
 	if (argc != 2){
-		cout << " Errore: argomenti non sufficienti, argc= "<< argc << endl;
+		cout << " Errore: argomenti non sufficienti, argc= "<< argc << " | " ;
 		for(int i=0; i<argc; i++)
 			cout << argv[i]<< " ";
+		cout << "\n Il corretto avvio del perforatore necessita di un file contenente un'istanza o un intero per la dimensione dell'istanza da creare\n";
+		cout << " Esempi: \n \t perforatore util/istanzaG57.txt  \n \t perforatore 100 \n";
 		return 0;
 	}
 	try{
 		numeroNodi = stoi(argv[1]);
 	}
 	catch (std::exception& e) {
-		cout << ">>>Eccezione nella lettura del parametro numerico in input " << e.what() << endl;
+		cout << " Creazione istanza da file... "<< endl;
 		try{
             fileName = argv[1];
 		}
@@ -57,150 +59,87 @@ int main(int argc, char const *argv[]) {
 	else 
 		ist = new Istanza(fileName);
 	
-	Soluzione* sol = new Soluzione(ist);
-	//cout << " Stampo la soluzione di base:"<<endl;
-	//sol->stampa();
+	// 	FLAG DI ATTIVAZIONE / DISATTIVAZIONE DEI SOLVER E DELLE ALTRE FUNZIONALITÀ 
+	bool attivoCPLEX = true;				// solver CPLEX attivato
+	bool attivoNS = true;				// NearSolver attivato
+	bool attivoMIO = true;				// MioSolver attivato
+	bool attivoTWO = true;				// TwoOptSolver attivato
+	bool scriviIstanza = true;			// scrittura istanza attivata
+	bool SolNS = true;					// scrittura soluzione NearSolver attivata
+	bool SolMIO = true;					// scrittura soluzione MioSolver attivata
+	bool SolTWO = true;					// scrittura soluzione TwoOptSolver attivata
+	bool qualsiasiSTART = true;			// ricerca nodo iniziale ottimo attivata
 	
-	string nomeFileIst = "Ist_JSON";
-	nomeFileIst = nomeFileIst+to_string(ist->getN())+".txt";
-	//ist->toFileJSON(nomeFileIst);
-	//ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
-	
-	//CPLEX_Solver* CPX = new CPLEX_Solver(ist, env, lp);
-	//CPX->risolvi();
-	
-	// TODO: da notare il fatto che iniziare dal punto 0 o 3 o 5 cambia abbastanza le cose
+	//	VALORI DEFAULT PER I SOLVER 
+	const int MAX_2OPT = 10000;
+	const int MAX_K = 30;
 	int START = 0;
 	
-	NearSolver* NS = new NearSolver(ist);
-	MioSolver* MIO = new MioSolver(ist,30);
-	TwoOptSolver* TWO = new TwoOptSolver(ist, 1000);
-
-	Soluzione* solInteressante;
-	Soluzione* solMia;
 	
+	if (qualsiasiSTART)
+		START = -1;
 	
-	double minimoMio = 1000000000;
-	int maxProve = 30;
-	/*for (int i=0; i<maxProve; i++){
-		MIO->risolvi(i);
-		if (MIO->getFO()<minimoMio){
-			minimoMio = MIO->getFO();
-			}
-	}*/
-	
-	double minNS = 1000000000;
-	double minMIO = 1000000000;
-	double minTWO = 1000000000;
-	double minTWOtempo;
-	int recordTWO = START;
-	int recordNS = START;
-	int recordMIO = START;
-	
-	//for (START=0; START<ist->getN(); START++){
-		NS->risolvi(START);
-		MIO->risolvi(START);
-		TWO->risolvi(START);
-		/*
-		if (NS->getFO()<minNS){
-			minNS = NS->getFO();
-			recordNS = START;
-			}
-		if (MIO->getFO()<minMIO){
-			minMIO = MIO->getFO();
-			recordMIO = START;
-			}
-		if (TWO->getFO()<minTWO) {
-			minTWO = TWO->getFO();
-			minTWOtempo = TWO->getTempoRisoluzione();
-			recordTWO = START;
-			}
-		/*
-		cout << " Il minimo per Nearest Neighbor è: "<< NS->getFO() << " [partenza: "<<START<<"]"<< endl;
-		cout << " Il minimo per Mio Solver è: "<< MIO->getFO() << " [partenza: "<<START<<"]"<< endl;
-		cout << " Il minimo per TwoOpt Solver è: "<< TWO->getFO() << " [partenza: "<<START<<"]"<< endl<<endl;
-		*/
+	if (scriviIstanza){
+		string nomeFileIst = "util/Ist_rand";
+		nomeFileIst = nomeFileIst+to_string(ist->getN())+".txt";
+		ist->toFileJSON(nomeFileIst);
+		//ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
+		}
 		
-		//} 
-	// solInteressante = NS->getSoluzione();
-	// TWO->risolvi(recordSTART);
-	// solMia = TWO->getSoluzione();
+	if (ist->getN()>300)			// disabilita CPLEX per istanze più grandi di 300 nodi
+		attivoCPLEX = false;
+	CPLEX_Solver* CPX;
+	if (attivoCPLEX){
+		CPX = new CPLEX_Solver(ist, env, lp);
+		if (ist->getN()<60)
+		CPX->risolvi();
+		}
+	
+	NearSolver* NS;
+	if (attivoNS){
+		NS = new NearSolver(ist);
+		NS->risolvi(START);
+		}
+	if (SolNS)
+		NS->getSoluzione()->toFileJSON("util/solNear.txt");
+	
+	MioSolver* MIO;
+	if (attivoMIO){
+		MIO = new MioSolver(ist, MAX_K);
+		MIO->risolvi(START);
+		}
+	if (SolMIO)
+		MIO->getSoluzione()->toFileJSON("util/solMio.txt");
+	
+	TwoOptSolver* TWO;
+	if (attivoTWO){
+		TWO = new TwoOptSolver(ist, MAX_2OPT);
+		TWO->risolvi(START);
+		}
+	if (SolTWO)
+		TWO->getSoluzione()->toFileJSON("util/solTwo_Opt.txt");
 
-	// solInteressante->toFileJSON("util/disegno istanze/solNearest.txt");
-	// solMia->toFileJSON("util/disegno istanze/solTwo.txt");
 	
 	cout << "\n\n -------  RISULTATI FINALI  -------- \n\n";
-	//cout << " Il minimo per CPLEX è: "<< CPX->getFO() << " in "<<CPX->getTempoRisoluzione()<< " secondi " << endl;
-	//cout << " Il minimo per Mio Solver è: "<< minimoMio << endl;
-	cout << " Il minimo per Nearest Neighbor è: "<< NS->getFO() << " in " << NS->getTempoRisoluzione() << " secondi [start: "<<recordNS<<"]" << endl;
-	cout << " Il minimo per Mio Solver è: "<< MIO->getFO() << " in " << MIO->getTempoRisoluzione() << " secondi [start: "<<recordMIO<<"]" << endl;
-	cout << " Il minimo per TwoOpt Solver è: "<< TWO->getFO() << " in " << TWO->getTempoRisoluzione() << " secondi [start: "<<recordTWO<<"]" << endl;
-	
-	
-	
+	if (attivoCPLEX) cout << " Il minimo per CPLEX è: "<< CPX->getFO() << " in "<<CPX->getTempoRisoluzione()<< " secondi " << endl;
+	if (attivoNS)	cout << " Il minimo per Nearest Neighbor è: "<< NS->getFO() << " in " << NS->getTempoRisoluzione() << " secondi " << endl;
+	if (attivoMIO)	cout << " Il minimo per Mio Solver è: "<< MIO->getFO()  << " in " << MIO->getTempoRisoluzione() << " secondi " << endl;
+	if (attivoTWO)	cout << " Il minimo per TwoOpt Solver è: "<< TWO->getFO()  << " in " << TWO->getTempoRisoluzione() << " secondi " << endl;
 	
 	
 	// CANCELLA OGGETTI DALLO STACK
-	//delete CPX;
-	delete NS;
-	delete MIO;
-	delete TWO;
-	delete sol;
+	if (attivoNS) delete NS;
+	if (attivoMIO) delete MIO;
+	if (attivoTWO) delete TWO;
+	
 	delete ist;
 	
-	
-	// LIBERA MEMORIA CPLEX
-	CPXfreeprob(env, &lp);
-	CPXcloseCPLEX(&env);
-	
-	
-	
-	
-	
-	
-	
-	/*
-        // lettura della prima riga
-        try{
-            lettoreIstanza.open(fileName);
-            char* in = new char[100];
-            lettoreIstanza.getline(in,100);
-            string primaLinea(in);
-            primaLinea.erase(0,4);
-            numeroNodi = stoi(primaLinea);
-            cout << "Nodi: " << numeroNodi << endl;
-        }
-        catch (std::exception& e) {
-        std::cout << ">>>Eccezione durante lettura file istanza: " << e.what() << std::endl;
-        return 0;
-	}
-        double distanze[numeroNodi][numeroNodi];				
-        try{
-            // matrice con le distanze del problema
-            // lettura file istanza
-		for(int i=0; i<numeroNodi; i++)
-                    for(int j=0; j<numeroNodi; j++){
-                        if (lettoreIstanza.is_open()){
-                            double num;
-                            if (lettoreIstanza >> num)
-				distanze[i][j] = num;
-                            }
-			}
-		// STAMPA DELLA MATRICE LETTA
-		/*for(int i=0; i<numeroNodi; i++){
-			for(int j=0; j<numeroNodi; j++){
-				cout << distanze[i][j] << "\t";
-				}
-			cout << " |" << endl;
-			} */  /*
-            }
-	catch (std::exception& e) {
-        std::cout << ">>>Eccezione durante lettura file istanza: " << e.what() << std::endl;
-        return 0;
-	}
-	
-	*/
-    
+	if (attivoCPLEX){
+		// LIBERA MEMORIA CPLEX
+		delete CPX;
+		CPXfreeprob(env, &lp);
+		CPXcloseCPLEX(&env);
+    		}
     
     return 1;
 }

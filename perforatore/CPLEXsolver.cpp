@@ -42,9 +42,9 @@ void CPLEX_Solver::risolvi(){
 		
 		chrono::high_resolution_clock::time_point fine = std::chrono::high_resolution_clock::now();
 		//secondi duration = fine - inizio;
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(fine - inizio);
-		unsigned int millisec = duration.count();
-		tempoRisoluzione = millisec/1000;
+		auto duration = chrono::duration_cast<chrono::microseconds>(fine - inizio);
+		double microsec = duration.count();
+		tempoRisoluzione = microsec/1000000;
 		if (tempoRisoluzione >= 60.0){
 			int minuti = tempoRisoluzione/60;
 			double secondi = fmod(tempoRisoluzione, 60);
@@ -62,7 +62,7 @@ void CPLEX_Solver::risolvi(){
 	catch (std::exception& e) {
 		cout << ">>> Eccezione durante l'esecuzione del Solver CPLEX: " << e.what() << endl;
 	}
-	cout << " Problema risolto con il Solver CPLEX! \n";
+	if (verbose) cout << " Problema risolto con il Solver CPLEX! \n";
 }
 
 double CPLEX_Solver::getFO(){
@@ -92,11 +92,6 @@ void CPLEX_Solver::setupLP() {
 	
 	int N = ist->getN();
 	vector<vector<double>> distanze = *(ist->getDistanze());
-	
-	double C[N*N];							// distanze in forma di array monodimensione
-	for(int i=0; i<N; i++)
-		for(int j=0; j<N; j++)
-			C[i*N+j] = distanze[i][j];
 
 	int nodoStart = 0;			// imposto il nodo iniziale
 	int startIndice = 0;
@@ -148,7 +143,7 @@ void CPLEX_Solver::setupLP() {
             snprintf(name, NAME_SIZE, "Y_%d_%d", i, j);
             char* yname = (char*)(&name[0]);
             // inserimento delle variabili Y_i_j nel modello
-            CHECKED_CPX_CALL( CPXnewcols, ENV, LP, 1, &C[i*N+j], &lb, &ub, &ytype, &yname );
+            CHECKED_CPX_CALL( CPXnewcols, ENV, LP, 1, &distanze[i][j], &lb, &ub, &ytype, &yname );
         }
     }
 

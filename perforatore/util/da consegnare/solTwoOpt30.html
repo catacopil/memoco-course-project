@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="utf-8">
+        <title>Disegno TWO-OPT</title>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    </head>
+    <body>
+    <center>
+        <h1>Istanza disegnata con l'utilizzo di Google Charts</h1>
+        <h2>Solver TWO-OPT</h2>
+           <div id="chart_div" style="width: 900px; height: 900px;"></div>
+    </center>
+    
+    </body>
+    <script type="text/javascript" >
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['X', 'Y'],[ 988, 355],[ 866, 346],[ 894, 485],[ 837, 609],[ 909, 659],[ 810, 805],[ 758, 907],[ 697, 852],[ 593, 705],[ 554, 709],[ 529, 697],[ 317, 900],[ 312, 886],[ 117, 772],[ 25, 769],[ 47, 664],[ 256, 592],[ 327, 611],[ 248, 319],[ 252, 215],[ 102, 289],[ 129, 190],[ 34, 39],[ 375, 39],[ 392, 215],[ 379, 249],[ 556, 353],[ 729, 228],[ 724, 82],[ 859, 38]   ]);
+
+        var options = {
+          title: 'Soluzione Ist_rand30ok di TWO-OPT',
+          legend: 'none',
+          lineWidth: "1"
+        };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+      }
+      
+     </script>
+</html>
+
+
+
+
+
+       
+       
+    
+   
+   
+  

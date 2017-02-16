@@ -23,7 +23,6 @@ public:
 	
 	~Solver();
 	
-//	virtual void risolvi();
 	Soluzione* getSoluzione();
 
 protected:

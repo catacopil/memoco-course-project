@@ -8,9 +8,9 @@
 
 
 
-bool TwoOptSolver::verbose = true;
+bool TwoOptSolver::verbose = false;
 
-TwoOptSolver::TwoOptSolver(Istanza* i, int M=1000):Solver(i),maxOpt(M){			// il numero massimo di miglioramenti richiesti di default è 1000
+TwoOptSolver::TwoOptSolver(Istanza* i, int M=10000):Solver(i),maxOpt(M){			// il numero massimo di miglioramenti richiesti di default è 1000
 //  -------	COSTRUTTORE SEMPLICE
 	tempoRisoluzione = -1.0;
 	valoreFO = -1.0;
@@ -25,76 +25,100 @@ TwoOptSolver::~TwoOptSolver(){
 }
 
 
-void TwoOptSolver::risolvi(int start){
+void TwoOptSolver::risolvi(int nodoStart){
 //  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
 
 	try{
 		vector<int> giainseriti;
 		vector<vector<double>>* distanze = ist->getDistanze();
 		vector<Punto>* nodiIstanza = ist->getNodi();
-		int ultimoinserito = start;
-		int ilminore = 0;
+		
 		int numeroNodi = ist->getN();
+		
+		int nodoinit, nodofine;
+		nodoinit = nodoStart;
+		nodofine = nodoStart+1;
+		double minFO = DBL_MAX;
+		int migliorStart;
+		int migliorCount;
+		
+		if (nodoStart == -1){			// controllo se devo partire da ogni singolo nodo per risolvere il problema
+			nodoinit = 0;
+			nodofine = numeroNodi;
+		}
+		
 		cout << "\n Inizia l'esecuzione del Solver TwoOpt...." << endl;
 		chrono::high_resolution_clock::time_point inizio = std::chrono::high_resolution_clock::now();
-		
-		
-		ordinati.push_back((*nodiIstanza)[ultimoinserito]); 				// inserisco il primo
-		giainseriti.push_back(start);
-		for (int i=1; i<numeroNodi; i++){
-			// parto con i=1 perché il primo l'ho già inserito e faccio girare il ciclo N-1 volte
-			
-			// scelgo il prossimo nodo
-			double minDist = DBL_MAX;
-			for (int j=0; j<numeroNodi; j++){
-				if (ultimoinserito==j) continue;			// va avanti se il nodo è lo stesso
-				bool piupiccolo = (minDist > (*distanze)[ultimoinserito][j]);
-				bool esistegia = (find(giainseriti.begin(), giainseriti.end(), j) != giainseriti.end());
-				if (piupiccolo && !esistegia){			// allora aggiorno come prossimo punto scelto
-					ilminore = j;
-					minDist = (*distanze)[ultimoinserito][j];
-					}
-			}
-			if (minDist == DBL_MAX)						// non ho trovato un minimo
-				throw runtime_error(" Non ho trovato una distanza minima, minore a DBL_MAX! "); 
-			
-			// lo aggiungo a ordinati, aggiorno gli indici e aggiorno il totale
-			ordinati.push_back((*nodiIstanza)[ilminore]);
-			giainseriti.push_back(ilminore);
-			ultimoinserito = ilminore;
-		}		
 
-		// ciclo esterno per il numero di iterazioni che voglio
-		int count = 0;
-		bool trovato = true;
-		while (count < maxOpt && trovato){
-			// cerco 2 punti per il tentativo di 2opt 
-			trovato = false;
-			for (int i=0; i<ordinati.size()-1; i++)
-				for (int j=i+1; j<ordinati.size()-1; j++){
-					if (i==j || j==i+1 || i==j+1) continue;
-					
-					// provo a vedere se la 2opt porterebbe benefici
-					if (two_opt(i,j)){
-						trovato = true;
-						// se funziona allora faccio lo switch e modifico l'ordine dei punti di mezzo, incremento count anche
-						switch_two_opt(i,j);
-						count++;
+		for (int start=nodoinit; start<nodofine; start++){
+			int ultimoinserito = start;
+			int ilminore = 0;
+			// svuoto ordinati ( utile nel caso in cui lancio più volte il metodo risolvi )
+			ordinati.clear();
+			ordinati.push_back((*nodiIstanza)[ultimoinserito]); 				// inserisco il primo
+			giainseriti.clear();
+			giainseriti.push_back(start);
+			for (int i=1; i<numeroNodi; i++){
+				// parto con i=1 perché il primo l'ho già inserito e faccio girare il ciclo N-1 volte
+			
+				// scelgo il prossimo nodo
+				double minDist = DBL_MAX;
+				for (int j=0; j<numeroNodi; j++){
+					if (ultimoinserito==j) continue;			// va avanti se il nodo è lo stesso
+					bool piupiccolo = (minDist > (*distanze)[ultimoinserito][j]);
+					bool esistegia = (find(giainseriti.begin(), giainseriti.end(), j) != giainseriti.end());
+					if (piupiccolo && !esistegia){			// allora aggiorno come prossimo punto scelto
+						ilminore = j;
+						minDist = (*distanze)[ultimoinserito][j];
 						}
-					}
+				}
+				if (minDist == DBL_MAX)						// non ho trovato un minimo
+					throw runtime_error(" Non ho trovato una distanza minima, minore a DBL_MAX! "); 
+			
+				// lo aggiungo a ordinati, aggiorno gli indici e aggiorno il totale
+				ordinati.push_back((*nodiIstanza)[ilminore]);
+				giainseriti.push_back(ilminore);
+				ultimoinserito = ilminore;
+			}		
+
+			// ciclo esterno per il numero di iterazioni che voglio
+			int count = 0;
+			bool trovato = true;
+			while (count < maxOpt && trovato){
+				// cerco 2 punti per il tentativo di 2opt 
+				trovato = false;
+				for (int i=0; i<ordinati.size()-1; i++)
+					for (int j=i+1; j<ordinati.size()-1; j++){
+						if (i==j || j==i+1 || i==j+1) continue;
+					
+						// provo a vedere se la 2opt porterebbe benefici
+						if (two_opt(i,j)){
+							trovato = true;
+							// se funziona allora faccio lo switch e modifico l'ordine dei punti di mezzo, incremento count anche
+							switch_two_opt(i,j);
+							count++;
+							}
+						}
+				}
+			if (verbose) cout << " Eseguite "<< count << " two-opt";
+			if (!trovato)
+				if (verbose) cout << " Non ho più trovato miglioramenti !";
+		
+			// creo oggetto Soluzione e aggiorno la funzione obiettivo
+			sol = new Soluzione(ist, &ordinati);
+			valoreFO = sol->getFO();
+			if (verbose) cout << " Soluzione = "<< valoreFO <<endl;
+			if (valoreFO<minFO){
+				minFO = valoreFO;
+				migliorStart = start;
+				migliorCount = count;
+				}
 			}
-		if (verbose) cout << " Eseguite "<< count << " two-opt";
-		if (!trovato)
-			if (verbose) cout << " Non ho più trovato miglioramenti !"<<endl;
-		
-		// creo oggetto Soluzione e aggiorno la funzione obiettivo
-		sol = new Soluzione(ist, &ordinati);
-		valoreFO = sol->getFO();
-		
+		valoreFO = minFO;
 		chrono::high_resolution_clock::time_point fine = chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<chrono::milliseconds>(fine - inizio);
-		double millisec = duration.count();
-		tempoRisoluzione = millisec/1000;
+		auto duration = chrono::duration_cast<chrono::microseconds>(fine - inizio);
+		double microsec = duration.count();
+		tempoRisoluzione = microsec/1000000;
 		if (tempoRisoluzione >= 60.0){
 			int minuti = tempoRisoluzione/60;
 			double secondi = fmod(tempoRisoluzione, 60);
@@ -103,7 +127,7 @@ void TwoOptSolver::risolvi(int start){
 		else
 			cout << " Problema risolto in "<< tempoRisoluzione <<" secondi"<< endl;
 		
-		cout << " Valore funzione obiettivo per TwoOptSolver: " << valoreFO << " [start: "<< start <<" | count 2-opt:"<< count <<"]"<<endl<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
+		cout << " Valore funzione obiettivo per TwoOptSolver: " << valoreFO << " [start: "<< migliorStart <<" | count 2-opt:"<< migliorCount <<"]"<<endl<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
 		
 	}
 	catch (std::exception& e) {
@@ -145,18 +169,18 @@ void TwoOptSolver::switch_two_opt(int i, int j){
 	int puntoB = i+1;
 	int puntoC = j;
 	int puntoD = j+1;
-	vector<Punto> temp;
-	Punto t = ordinati[puntoB];						// scambio i punti interessati (sarebbero B e C)
+	Punto temp = ordinati[puntoB];						// scambio i punti interessati (sarebbero B e C)
 	ordinati[puntoB] = ordinati[puntoC];
-	ordinati[puntoC] = t;
+	ordinati[puntoC] = temp;
 	
 	// inverto l'ordine per i punti compresi tra puntoB e puntoC
-	vector<Punto>::iterator it;
- 	it = temp.begin();
-	for (int k = puntoB+1; k<puntoC; k++)
-		it = temp.insert(it, ordinati[k]);				// inserisco sempre in testa, in questo modo inverto l'ordine
-	for (int k=0; k<temp.size(); k++)
-		ordinati[puntoB+1+k] = temp[k];
+ 	int k2 = puntoC-1;
+ 	for (int k = puntoB+1; k<k2; k++){
+ 		temp = ordinati[k];
+ 		ordinati[k] = ordinati[k2];
+ 		ordinati[k2] = temp;
+ 		k2--;
+ 		}
 }
 
 

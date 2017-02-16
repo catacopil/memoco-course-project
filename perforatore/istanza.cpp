@@ -22,7 +22,7 @@ Istanza::Istanza(int numeroNodi = 10){			// costruttore di default oppure costru
 		bool trovato = true;
 		while (trovato){				// crea nuovi nodi se quello generato è uguale ad uno dei precedenti
 			trovato = false;
-			for (int s=0; s<arr_nodi.size() && not trovato; s++)
+			for (int s=0; s<arr_nodi.size() && !trovato; s++)
 				trovato = (arr_nodi[s]==nuovo);
 			if (trovato){
 				if (verbose) cout<< " !! Punto già presente: " << nuovo.stampa()<<endl;
@@ -52,32 +52,46 @@ Istanza::Istanza(string nomeFile){				// costruttore che legge l'istanza da un f
 	primaLinea.erase(0,4);
 	numeroNodi = stoi(primaLinea);
 	if (verbose) cout << "Nodi: " << numeroNodi << endl;
-	if (lettorePunti.is_open()){
-		while (lettorePunti.get(c)){					// leggo ogni carattere finchè non finisco il file 
-			//cout << c;	
-			if (std::isdigit(c)){
-				if (!hox) hox = true;
-				num = num*10 + std::stoi(&c);
-				}
-			else if (num!=0){
-				if (!hoy){				// ho letto x
-					x = num;
-					hoy = true;
-					hox = false;
+	lettorePunti.get(c);
+	streampos vecchiaPosizione = lettorePunti.tellg();
+	if (lettorePunti.is_open()){	
+		while (lettorePunti.get(c)){					// leggo ogni carattere finchè non finisco il file 	
+			if (isdigit(c)){
+				lettorePunti.seekg (vecchiaPosizione);
+				lettorePunti >> input;
+				if (!hox){					// ho letto x
+					hox = true;
+					x = input;
 					}
-				else{					// ho letto y
-					y = num;
-					}
-				num = 0;
-				if (hox && hoy){
-					Punto nuovo(x, y);
-					// ATTENZIONE: NO CONTROLLO DUPLICATI
-					arr_nodi.push_back(nuovo);
-					if (verbose) cout << " Letto ["<< x <<","<< y <<"]\t";
-					x = y = 0;
-					hox = hoy = false;
+				else if (!hoy){				// ho letto y
+						hoy = true;
+						y = input;
+						}
+				while (isdigit(c)){		// va avanti finchè ci sono cifre da leggere
+					lettorePunti.get(c);
+					vecchiaPosizione = lettorePunti.tellg();
 					}
 				}
+
+			if (hox && hoy){
+				Punto nuovo(x, y);
+				// CONTROLLO DUPLICATI
+				bool trovato = true;
+				while (trovato){				// crea nuovi nodi se quello generato è uguale ad uno dei precedenti
+					trovato = false;
+					for (int s=0; s<arr_nodi.size() && !trovato; s++)
+						trovato = (arr_nodi[s]==nuovo);
+					if (trovato){
+						cout<< " !! Punto già presente: " << nuovo.stampa()<<endl;
+						throw runtime_error(" Trovati 2 punti identici ----> "); 
+						}
+					}
+				arr_nodi.push_back(nuovo);
+				if (verbose) cout << " Letto ["<< x <<","<< y <<"]\t";
+				x = y = 0;
+				hox = hoy = false;
+				}
+			vecchiaPosizione = lettorePunti.tellg();
 			}
 		}
 	}
@@ -85,6 +99,7 @@ Istanza::Istanza(string nomeFile){				// costruttore che legge l'istanza da un f
 		cout << ">>>Eccezione durante lettura file istanza: " << e.what() << endl;
 	}
 	N = numeroNodi;
+	//stampaNodi();
 	calcolaMatriceDistanze();
 }
 
