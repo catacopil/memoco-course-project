@@ -6,7 +6,7 @@ Per l'istanza istanzaG57.txt:
 	 Il minimo per CPLEX è: 563.286
 	 Il minimo per Nearest Neighbor è: 635.802
 	 Il minimo per Mio Solver è: 581.626
-	 Il minimo per TwoOpt Solver è: 577.28
+	 Il minimo per TwoOpt Solver è: 586.429
 
 
 Per l'istanza istanzaG90.txt
@@ -15,7 +15,16 @@ Per l'istanza istanzaG90.txt
 	 Il minimo per CPLEX è: 949.879			(387 secondi)
 	 Il minimo per Nearest Neighbor è: 1016.23
 	 Il minimo per Mio Solver è: 1005.97
-	 Il minimo per TwoOpt Solver è: 964.765  	(0.000756 secondi)
+	 Il minimo per TwoOpt Solver è: 979.942 in 0 secondi [start: 3]
+
+Per l'istanza Google da 280 nodi:
+	 Valore FO per la soluzione di base: 2701.59
+	  
+	 Il minimo per Nearest Neighbor è: 3118.8 in 0.004597 secondi [start: 21]
+	 Il minimo per Mio Solver è: 2988.74 in 0.031551 secondi [start: 101]
+	 Il minimo per TwoOpt Solver è: 2721.21 in 0.009267 secondi [start: 21]
+
+	 
 
 ===> ./perforatore 3000
 	 -------  RISULTATI FINALI  -------- 
@@ -49,7 +58,23 @@ Per l'istanza istanzaG90.txt
 	 Il minimo per TwoOpt Solver è: 68193.3 in 31.9793 secondi
 
 
-===> 
+===> ./perforatore 8000
+ MioSolver creato per l'istanza richiesta 
+ Solver TwoOpt creato per l'istanza di richiesta 
+
+ Inizia l'esecuzione del NearSolver....
+ Problema risolto in 1 minuti e 8.956 secondi
+ Valore funzione obiettivo: 79179.1 [start: 0]
+
+
+ -------  RISULTATI FINALI  -------- 
+
+ Il minimo per Nearest Neighbor è: 79179.1 in 68.956 secondi [start: 0]
+ Il minimo per Mio Solver è: 1.79769e+308 in 0 secondi [start: 3]
+ Il minimo per TwoOpt Solver è: 1.79769e+308 in 0 secondi [start: 3]
+
+
+===>	
 
 
 ===>> QUELLA VOLTA CHE IL MIO HA FATTO MEGLIO:

@@ -1,0 +1,31 @@
+
+
+	TODO - ROBA ANCORA DA FARE	
+	
+	URGENTE ADESSO
+		- OK [1 ORA] tentare di implementare una delle soluzioni proposte da Luigi nel PDF suo (quella con l'aggiunta di vincoli man mano che individuo i sottocicli )
+			---> entro 1:00
+		- [20 MIN] rendere più decente il main
+			- permettere la scelta di quali solver utilizzare (con parametri di input)
+			- permettere la scelta del K per MioSolver
+			- permettere la scelta se ciclare o scegliere un nodo iniziale
+		- OK [10 MIN] pulizia in TwoOpt
+	
+	
+	OBBLIGATORIO
+		- Test in lab via SSH
+		OK - Sistemare il conteggio dei tempi
+		- Relazione
+			- Descrizione dei vari solver
+			- Presentazione dei risultati
+			- Commenti personali a riguardo
+		
+		OK - Un'occhiata veloce ai commenti di documentazione
+		OK - Un'occhiata veloce ai TODO rimasti
+		
+	
+	
+	OPZIONALE
+		- pulire il codice da commenti inutili
+		- passare il valore del verbose nella creazione degli oggetti
+		- analisi della distruzione di tutti gli oggetti

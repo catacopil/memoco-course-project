@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="utf-8">
+        <title>Disegno Istanze</title>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    </head>
+    <body>
+    <center>
+        <h1>Istanza disegnata con l'utilizzo di Google Charts</h1>
+        <h2>Solver TWO-OPT</h2>
+           <div id="chart_div" style="width: 900px; height: 900px;"></div>
+    </center>
+    
+    </body>
+    <script type="text/javascript" >
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['X', 'Y'],[ 270, 133],[ 280, 133],[ 288, 129],[ 288, 149],[ 256, 141],[ 246, 141],[ 236, 145],[ 228, 145],[ 220, 145],[ 212, 145],[ 204, 145],[ 196, 145],[ 188, 145],[ 180, 125],[ 180, 117],[ 180, 109],[ 180, 101],[ 180, 93],[ 188, 93],[ 196, 101],[ 204, 109],[ 212, 117],[ 220, 125],[ 228, 125],[ 228, 117],[ 228, 109],[ 228, 101],[ 236, 101],[ 236, 93],[ 228, 93],[ 228, 85],[ 236, 85],[ 236, 77],[ 236, 69],[ 236, 61],[ 228, 53],[ 228, 61],[ 228, 69],[ 228, 77],[ 220, 73],[ 212, 65],[ 204, 57],[ 196, 49],[ 180, 45],[ 172, 45],[ 156, 25],[ 120, 9],[ 128, 9],[ 136, 9],[ 148, 9],[ 162, 9],[ 172, 21],[ 180, 21],[ 180, 29],[ 172, 29],[ 172, 37],[ 180, 37],[ 188, 41],[ 236, 21],[ 252, 21],[ 260, 29],[ 260, 37],[ 260, 45],[ 260, 53],[ 260, 61],[ 260, 69],[ 260, 77],[ 260, 85],[ 260, 93],[ 276, 77],[ 276, 69],[ 276, 61],[ 276, 53],[ 284, 53],[ 284, 61],[ 284, 69],[ 284, 77],[ 284, 85],[ 276, 85],[ 276, 93],[ 284, 93],[ 284, 101],[ 288, 109],[ 280, 109],[ 276, 101],[ 268, 97],[ 252, 101],[ 260, 109],[ 252, 125],[ 260, 129]   ]);
+
+        var options = {
+          title: 'Soluzione con TWO-OPT',
+          //hAxis: {title: 'X'},
+          //vAxis: {title: 'Y'},
+          legend: 'none',
+          lineWidth: "1"
+        };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+      }
+      
+     </script>
+</html>
+
+
+
+
+
+       
+       
+    
+   
+   
+  
