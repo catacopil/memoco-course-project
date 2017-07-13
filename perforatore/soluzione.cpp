@@ -14,18 +14,21 @@ bool Soluzione::verbose = false;
 Soluzione::Soluzione(Istanza* i){
 //  -------	COSTRUTTORE SEMPLICE, CHE UTILIZZA L'ORDINE ATTUALE DEI NODI NELL'ISTANZA COME SOLUZIONE
 	ist = i;
-	ordinati = *(ist->getNodi());
-	N = ordinati.size();
+	N = ist->getN();
+	for (int i=0; i<N; i++)
+		nodiOrdinati.push_back(i);
+	//ordinati = *(ist->getNodi());
+	//N = ordinati.size();
 	FO = calcolaFO();
-	if (verbose) cout << " Soluzione generata per i "<<N<<" punti in ordine di istanza \n";
+	if (verbose) cout << " Soluzione iniziale generata per i "<<N<<" punti in ordine di istanza \n";
 }
 
 
 Soluzione::Soluzione(Istanza* i, vector<Punto>* v){
 // ---------	COSTRUTTORE CON ARRAY DI NODI ORDINATI	---------
 	ist = i;
-	ordinati = *v;
-	N = ordinati.size();
+	N = ist->getN();
+	//ordinati = *v;
 	FO = calcolaFO();
 	if (verbose) cout << " Soluzione creata con i "<<N<<" punti dati \n";
 }
@@ -44,13 +47,13 @@ double Soluzione::getFO(){
 double Soluzione::calcolaFO(){
 //	-------	CALCOLA LA FUNZIONE OBIETTIVO  	-------
 	double tot = 0.0;
-	for(int i=0; i<ordinati.size(); i++){
-		Punto A = ordinati[i];
+	for(int i=0; i<nodiOrdinati.size(); i++){
+		Punto A = ist->getPunto(nodiOrdinati[i]);
 		Punto B(0,0);
-		if ((i+1)<ordinati.size())					// calcola sempre la distanza con il successivo, a parte l'ultimo dove prende la distanza tra ultimo e primo
-			B = ordinati[i+1];
+		if ((i+1)<nodiOrdinati.size())					// calcola sempre la distanza con il successivo, a parte l'ultimo dove prende la distanza tra ultimo e primo
+			B = ist->getPunto(nodiOrdinati[i+1]);
 		else
-			B = ordinati[0];
+			B = ist->getPunto(nodiOrdinati[0]);
 		tot = tot + A.distanza(&B);
 		//cout << " tot FO = " << tot << endl;
 		}
@@ -61,12 +64,12 @@ double Soluzione::calcolaFO(){
 void Soluzione::stampa(){
 //  -------	STAMPA A VIDEO I PUNTI DELLA SOLUZIONE  	--------
 	cout << "\n Nodi soluzione: "<<endl;
-	for(int k=0; k<ordinati.size(); k++){		
-		Punto p = ordinati[k];
+	for(int k=0; k<nodiOrdinati.size(); k++){		
+		Punto p = ist->getPunto(nodiOrdinati[k]);
 		cout <<" "<< k << ") " << p.stampa() << endl;
 		}
 	cout << endl;
-	if (verbose) cout << " Stampati i "<<ordinati.size()<< " nodi della soluzione \n";
+	if (verbose) cout << " Stampati i "<<nodiOrdinati.size()<< " nodi della soluzione \n";
 }
 
 
@@ -79,12 +82,13 @@ string Soluzione::toFileJSON(string nomeFile = ""){
 	pFile = fopen(nomeFileJSON.c_str(), "w");
 	if (pFile!= NULL){
      	fprintf(pFile, " N = %d \n ([", N);
-     	for (int i=0; i<ordinati.size(); i++){
-     		fprintf(pFile, "[ %d,", ordinati[i].x);
-     		if (i==ordinati.size()-1)
-     			fprintf(pFile, " %d]", ordinati[i].y);			// stampo l'ultimo senza la virgola dopo le quadre
+     	for (int i=0; i<nodiOrdinati.size(); i++){
+     		Punto p = ist->getPunto(nodiOrdinati[i]);
+     		fprintf(pFile, "[ %d,", p.x);
+     		if (i==nodiOrdinati.size()-1)
+     			fprintf(pFile, " %d]", p.y);			// stampo l'ultimo senza la virgola dopo le quadre
      		else
-	     		fprintf(pFile, " %d],", ordinati[i].y);
+	     		fprintf(pFile, " %d],", p.y);
      		}
 		fprintf(pFile, "]) \n");
 		fclose(pFile);

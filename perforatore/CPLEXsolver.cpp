@@ -123,8 +123,8 @@ void CPLEX_Solver::setupLP() {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
 			if (i==j) continue;
-            char xtype = 'I'; 		// variabile di tipo intero
-            double lb = 0.0; 		// limite inferiore del dominio, notare che è un double
+            char xtype = 'I'; 			// variabile di tipo intero
+            double lb = 0.0; 				// limite inferiore del dominio, notare che è un double
             double ub = CPX_INFBOUND; 		// limite superiore
             snprintf(name, NAME_SIZE, "X_%d_%d", i, j);         // costruisce array con i nomi delle variabili X
             // std::cout << "|" << name[0] << "| i=" <<i<<" j="<<j<< std::endl;
@@ -234,8 +234,38 @@ void CPLEX_Solver::setupLP() {
             double termineNoto[1] = {0};
             CHECKED_CPX_CALL( CPXaddrows, ENV, LP, 0, 1, idx.size(), termineNoto, &sense, &matbeg, &idx[0], &coef[0], 0, 0 );
             }
-	}
+	} 
 	if (verbose) cout << " La descrizione del problema è stata completata per il Solver CPLEX \n";
 }
+/*
 
+void CPLEX_Solver::printCols(){
+	// docs: https://www.ibm.com/support/knowledgecenter/SSSA5P_12.6.3/ilog.odms.cplex.help/refcallablelibrary/cpxapi/getcols.html?view=kc
+	int N = ist->getN();
+	int nonzeroReturned;
+	int begin = 0;
+	int end = N * (N-1);						// prendo solo le X_i_j
+	int cmatspace =  (N*3) *(N-1);					// dimensione massima possibile per i valori che recupero
+	std::vector<int> cmatbeg(end-begin+1);				// conterrà gli indici che specificano dove inizia ogni colonna con i valori richiesti
+	std::vector<int> cmatRowIndex(cmatspace);				// conterrà gli indici della riga associata ad ogni valore di cmatval
+	std::vector<double> cmatval(cmatspace);					// conterrà i valori non_zero recuperati 
+	int surplus_p;									// conterrà il valore del surplus
 
+	CHECKED_CPX_CALL(CPXgetcols, ENV, LP, &nonzeroReturned, &cmatbeg[0], &cmatRowIndex[0], &cmatval[0], cmatspace, &surplus_p, begin, end);
+	
+
+	cout << " Cmatbeg: \n";
+	for(int i=0; i<end-begin+1; i++)
+		cout << " "<< i <<") \t"<< cmatbeg[i]<<endl;
+	
+	cout << " cmatRowIndex: \n";
+	for(int i=0; i<cmatspace; i++)
+		cout << " "<< i <<") \t"<< cmatRowIndex[i]<<endl;
+			
+	cout << " cmatval: \n";
+	for(int i=0; i<cmatspace; i++)
+		cout << " "<< i <<") \t"<< cmatval[i]<<endl;
+		
+	cout << " Surplus_p = " << surplus_p << endl;
+
+} */

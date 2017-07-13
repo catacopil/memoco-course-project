@@ -35,9 +35,10 @@ public:
 
 private:
 	int N;
-	double FO;
+	double FO;									// contiene il valore della Funzione Obiettivo
 	Istanza* ist;
-	vector<Punto> ordinati;							// contiene i nodi dell'istanza (lista di punti) 
+	//vector<Punto> ordinati;							// contiene i nodi dell'istanza (lista di punti) 
+	vector<short> nodiOrdinati;						// contiene gli indici dei nodi della soluzione
 	double calcolaFO();								// calcola la funzione obiettivo della soluzione, cioè la distanza tra tutti i nodi seguendo il loro ordine (compreso la distanza dall'ultimo dal primo --> ritorno al punto di partenza )
 
 };

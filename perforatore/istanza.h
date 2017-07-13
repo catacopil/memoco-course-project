@@ -26,19 +26,20 @@ public:
 	Istanza(string);								// lettura istanza da file
 
 	int getN();									// restituisce il numero di nodi
+	Punto getPunto(int);							// prende il punto di una determinata posizione
 	vector<Punto>* getNodi();						// restituisce un puntatore ad una copia di arr_nodi
 	vector<vector<double>>* getDistanze();				// restituisce la matrice delle distanze
 	void stampaNodi();								// stampa l'istanza (lista di punti)
 	
 	string toFileJSON(string);						// esporta in un file di testo l'istanza in formato JSON
 	string toFileMatriceDistanze(string);				// esporta in un file di testo la matrice delle distanze
-	
 
 
 private:
 	int N;
 	vector<Punto> arr_nodi;							// contiene i nodi dell'istanza (lista di punti)
 	vector<vector<double>> M;						// la matrice delle distanze tra i nodi dell'istanza
+	bool matriceDistanzeCalcolata;
 	void calcolaMatriceDistanze();					// calcola la matrice delle distanze
 
 };

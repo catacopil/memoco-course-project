@@ -61,19 +61,21 @@ int main(int argc, char const *argv[]) {
 	
 	// 	FLAG DI ATTIVAZIONE / DISATTIVAZIONE DEI SOLVER E DELLE ALTRE FUNZIONALITÀ 
 	bool attivoCPLEX = true;				// solver CPLEX attivato
-	bool attivoNS = true;				// NearSolver attivato
-	bool attivoMIO = true;				// MioSolver attivato
-	bool attivoTWO = true;				// TwoOptSolver attivato
-	bool scriviIstanza = true;			// scrittura istanza attivata
-	bool SolNS = true;					// scrittura soluzione NearSolver attivata
-	bool SolMIO = true;					// scrittura soluzione MioSolver attivata
-	bool SolTWO = true;					// scrittura soluzione TwoOptSolver attivata
-	bool qualsiasiSTART = true;			// ricerca nodo iniziale ottimo attivata
+	bool attivoNS = false;				// NearSolver attivato
+	bool attivoMIO = false;				// MioSolver attivato
+	bool attivoTWO = false;				// TwoOptSolver attivato
+	bool scriviIstanza = false;			// scrittura istanza attivata
+	bool SolNS = false;					// scrittura soluzione NearSolver attivata
+	bool SolMIO = false;					// scrittura soluzione MioSolver attivata
+	bool SolTWO = false;					// scrittura soluzione TwoOptSolver attivata
+	bool qualsiasiSTART = false;			// ricerca nodo iniziale ottimo attivata
 	
 	//	VALORI DEFAULT PER I SOLVER 
 	const int MAX_2OPT = 10000;
 	const int MAX_K = 30;
 	int START = 0;
+	const int MAX_CPLEX_PROB = 300;			// limite massimo nodi per la generazione del problema CPLEX
+	const int MAX_CPLEX_EXEC = 100;			// limite massimo nodi per l'esecuzione del solver CPLEX
 	
 	
 	if (qualsiasiSTART)
@@ -86,12 +88,12 @@ int main(int argc, char const *argv[]) {
 		//ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
 		}
 		
-	if (ist->getN()>300)			// disabilita CPLEX per istanze più grandi di 300 nodi
+	if (ist->getN()>MAX_CPLEX_PROB)			// disabilita CPLEX per istanze più grandi di 300 nodi
 		attivoCPLEX = false;
 	CPLEX_Solver* CPX;
 	if (attivoCPLEX){
 		CPX = new CPLEX_Solver(ist, env, lp);
-		if (ist->getN()<60)
+		if (ist->getN()<=MAX_CPLEX_PROB)
 		CPX->risolvi();
 		}
 	
@@ -99,25 +101,28 @@ int main(int argc, char const *argv[]) {
 	if (attivoNS){
 		NS = new NearSolver(ist);
 		NS->risolvi(START);
+		if (SolNS)
+			NS->getSoluzione()->toFileJSON("util/solNear.txt");
 		}
-	if (SolNS)
-		NS->getSoluzione()->toFileJSON("util/solNear.txt");
+	
 	
 	MioSolver* MIO;
 	if (attivoMIO){
 		MIO = new MioSolver(ist, MAX_K);
 		MIO->risolvi(START);
+		if (SolMIO)
+			MIO->getSoluzione()->toFileJSON("util/solMio.txt");
 		}
-	if (SolMIO)
-		MIO->getSoluzione()->toFileJSON("util/solMio.txt");
+	
 	
 	TwoOptSolver* TWO;
 	if (attivoTWO){
 		TWO = new TwoOptSolver(ist, MAX_2OPT);
 		TWO->risolvi(START);
+		if (SolTWO)
+			TWO->getSoluzione()->toFileJSON("util/solTwo_Opt.txt");
 		}
-	if (SolTWO)
-		TWO->getSoluzione()->toFileJSON("util/solTwo_Opt.txt");
+	
 
 	
 	cout << "\n\n -------  RISULTATI FINALI  -------- \n\n";

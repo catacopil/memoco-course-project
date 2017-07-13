@@ -13,6 +13,7 @@ bool Istanza::verbose = false;
 
 Istanza::Istanza(int numeroNodi = 10){			// costruttore di default oppure costruttore di istanze casuali
 	N = numeroNodi;
+	matriceDistanzeCalcolata = false;
 	random_device rd;
 	mt19937 mt_generator(rd());
 	uniform_int_distribution<int> distribution(0,1000);			// generatore casuale di interi tra 0 e 1000
@@ -31,11 +32,11 @@ Istanza::Istanza(int numeroNodi = 10){			// costruttore di default oppure costru
 			}
 		arr_nodi.push_back(nuovo);
 		}
-	calcolaMatriceDistanze();
 	if (verbose) cout << " Generati "<<N<<" punti random \n";
 }
 
 Istanza::Istanza(string nomeFile){				// costruttore che legge l'istanza da un file
+	matriceDistanzeCalcolata = false;
 	int num, x, y; num = x = y = 0;
 	char c;
 	bool hox=false, hoy=false;
@@ -100,7 +101,6 @@ Istanza::Istanza(string nomeFile){				// costruttore che legge l'istanza da un f
 	}
 	N = numeroNodi;
 	//stampaNodi();
-	calcolaMatriceDistanze();
 }
 
 void Istanza::stampaNodi(){
@@ -118,6 +118,13 @@ int Istanza::getN(){
 	return N;
 }
 
+Punto Istanza::getPunto(int index){
+	if (index>=0 && index<arr_nodi.size())
+		return arr_nodi[index];
+	else 
+		return Punto(0,0);
+}
+
 
 vector<Punto>* Istanza::getNodi(){
 //  --------	CREA UNA COPIA DEI NODI DELL'ISTANZA	----------
@@ -129,6 +136,8 @@ vector<Punto>* Istanza::getNodi(){
 
 vector<vector<double>>* Istanza::getDistanze(){
 //  --------	CREA UNA COPIA DELLA MATRICE DELLE DISTANZE 	-------
+	if (!matriceDistanzeCalcolata)
+		calcolaMatriceDistanze();
 	vector<vector<double>>* copia = new vector<vector<double>>;
 	*copia = M;
 	return copia;
@@ -162,6 +171,8 @@ string Istanza::toFileJSON(string nomeFile = ""){
 
 string Istanza::toFileMatriceDistanze(string nomeFile = ""){
 // -------	SCRITTURA MATRICE DISTANZE SU FILE		--------		
+	if (!matriceDistanzeCalcolata)
+		calcolaMatriceDistanze();
 	FILE* pFile;
 	string nomeFileOut = nomeFile;
 	if (nomeFileOut == "")
@@ -191,6 +202,7 @@ void Istanza::calcolaMatriceDistanze(){
 			Punto B = arr_nodi[j];
 			M[i][j] = A.distanza(&B);
 			}
+	matriceDistanzeCalcolata = true;
 	if (verbose) cout << " Effettuato il calcolo della matrice delle distanze tra " << arr_nodi.size() << " nodi" << endl;
 }
 
