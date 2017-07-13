@@ -24,11 +24,11 @@ Soluzione::Soluzione(Istanza* i){
 }
 
 
-Soluzione::Soluzione(Istanza* i, vector<Punto>* v){
+Soluzione::Soluzione(Istanza* i, vector<short>* v){
 // ---------	COSTRUTTORE CON ARRAY DI NODI ORDINATI	---------
 	ist = i;
 	N = ist->getN();
-	//ordinati = *v;
+	nodiOrdinati = *v;
 	FO = calcolaFO();
 	if (verbose) cout << " Soluzione creata con i "<<N<<" punti dati \n";
 }

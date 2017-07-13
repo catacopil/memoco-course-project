@@ -11,8 +11,7 @@
 #include "solver.h"
 #include "CPLEXsolver.h"
 #include "Nearsolver.h"
-#include "Miosolver.h"
-#include "TwoOptSolver.h"
+//#include "TwoOptSolver.h"
 
 using namespace std;
 
@@ -60,15 +59,13 @@ int main(int argc, char const *argv[]) {
 		ist = new Istanza(fileName);
 	
 	// 	FLAG DI ATTIVAZIONE / DISATTIVAZIONE DEI SOLVER E DELLE ALTRE FUNZIONALITÀ 
-	bool attivoCPLEX = true;				// solver CPLEX attivato
-	bool attivoNS = false;				// NearSolver attivato
-	bool attivoMIO = false;				// MioSolver attivato
+	bool attivoCPLEX = false;				// solver CPLEX attivato
+	bool attivoNS = true;				// NearSolver attivato
 	bool attivoTWO = false;				// TwoOptSolver attivato
 	bool scriviIstanza = false;			// scrittura istanza attivata
 	bool SolNS = false;					// scrittura soluzione NearSolver attivata
-	bool SolMIO = false;					// scrittura soluzione MioSolver attivata
 	bool SolTWO = false;					// scrittura soluzione TwoOptSolver attivata
-	bool qualsiasiSTART = false;			// ricerca nodo iniziale ottimo attivata
+	bool qualsiasiSTART = true;			// ricerca nodo iniziale ottimo attivata
 	
 	//	VALORI DEFAULT PER I SOLVER 
 	const int MAX_2OPT = 10000;
@@ -85,7 +82,7 @@ int main(int argc, char const *argv[]) {
 		string nomeFileIst = "util/Ist_rand";
 		nomeFileIst = nomeFileIst+to_string(ist->getN())+".txt";
 		ist->toFileJSON(nomeFileIst);
-		//ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
+		ist->toFileMatriceDistanze("Ist_MatriceDistanze.txt");
 		}
 		
 	if (ist->getN()>MAX_CPLEX_PROB)			// disabilita CPLEX per istanze più grandi di 300 nodi
@@ -106,36 +103,25 @@ int main(int argc, char const *argv[]) {
 		}
 	
 	
-	MioSolver* MIO;
-	if (attivoMIO){
-		MIO = new MioSolver(ist, MAX_K);
-		MIO->risolvi(START);
-		if (SolMIO)
-			MIO->getSoluzione()->toFileJSON("util/solMio.txt");
-		}
-	
-	
-	TwoOptSolver* TWO;
+/*	TwoOptSolver* TWO;
 	if (attivoTWO){
 		TWO = new TwoOptSolver(ist, MAX_2OPT);
 		TWO->risolvi(START);
 		if (SolTWO)
 			TWO->getSoluzione()->toFileJSON("util/solTwo_Opt.txt");
-		}
+		} */
 	
 
 	
 	cout << "\n\n -------  RISULTATI FINALI  -------- \n\n";
 	if (attivoCPLEX) cout << " Il minimo per CPLEX è: "<< CPX->getFO() << " in "<<CPX->getTempoRisoluzione()<< " secondi " << endl;
 	if (attivoNS)	cout << " Il minimo per Nearest Neighbor è: "<< NS->getFO() << " in " << NS->getTempoRisoluzione() << " secondi " << endl;
-	if (attivoMIO)	cout << " Il minimo per Mio Solver è: "<< MIO->getFO()  << " in " << MIO->getTempoRisoluzione() << " secondi " << endl;
-	if (attivoTWO)	cout << " Il minimo per TwoOpt Solver è: "<< TWO->getFO()  << " in " << TWO->getTempoRisoluzione() << " secondi " << endl;
+	//if (attivoTWO)	cout << " Il minimo per TwoOpt Solver è: "<< TWO->getFO()  << " in " << TWO->getTempoRisoluzione() << " secondi " << endl;
 	
 	
 	// CANCELLA OGGETTI DALLO STACK
 	if (attivoNS) delete NS;
-	if (attivoMIO) delete MIO;
-	if (attivoTWO) delete TWO;
+//	if (attivoTWO) delete TWO;
 	
 	delete ist;
 	

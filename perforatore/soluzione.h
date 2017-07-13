@@ -24,7 +24,7 @@ public:
 	static bool verbose;							// indica se stampare sulla console messaggi di log sull'avanzamento del programma
 
 	Soluzione(Istanza*);							// Soluzione creata di default per un'istanza ---> usa l'ordine dei punti che trova dentro l'istanza
-	Soluzione(Istanza*, vector<Punto>*);				// Soluzione creata con un array di punti 
+	Soluzione(Istanza*, vector<short>*);				// Soluzione creata con un array di indici 
 
 	int getN();									// restituisce il numero di nodi
 	double getFO();								// restituisce il valore della Funzione Obiettivo della soluzione corrente
@@ -36,8 +36,7 @@ public:
 private:
 	int N;
 	double FO;									// contiene il valore della Funzione Obiettivo
-	Istanza* ist;
-	//vector<Punto> ordinati;							// contiene i nodi dell'istanza (lista di punti) 
+	Istanza* ist;									// puntatore all'oggetto Istanza di cui è soluzione
 	vector<short> nodiOrdinati;						// contiene gli indici dei nodi della soluzione
 	double calcolaFO();								// calcola la funzione obiettivo della soluzione, cioè la distanza tra tutti i nodi seguendo il loro ordine (compreso la distanza dall'ultimo dal primo --> ritorno al punto di partenza )
 

@@ -36,7 +36,6 @@ public:
 private:
 	double tempoRisoluzione;
 	double valoreFO;
-	vector<vector<double>>* distanze;
 };
 
 
