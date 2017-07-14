@@ -27,6 +27,7 @@ public:
 	Soluzione(Istanza*, vector<short>*);				// Soluzione creata con un array di indici 
 
 	int getN();									// restituisce il numero di nodi
+	short getIndicePunto(int); 						// restituisce l'indice di un determinato nodo nella soluzione
 	double getFO();								// restituisce il valore della Funzione Obiettivo della soluzione corrente
 	void stampa();									// stampa l'istanza (lista di punti)
 	

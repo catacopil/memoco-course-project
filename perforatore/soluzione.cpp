@@ -38,6 +38,10 @@ int Soluzione::getN(){
 	return N;
 }
 
+short Soluzione::getIndicePunto(int index){
+	return nodiOrdinati[index];
+}
+
 
 double Soluzione::getFO(){
 	return FO;

@@ -19,14 +19,14 @@ NearSolver::NearSolver(Istanza* i):Solver(i){
 }
 
 NearSolver::~NearSolver(){
-//  ------	DISTRUTTORE
+//  ------	DISTRUTTORE 	
 }
 
 
 void NearSolver::risolvi(int nodoStart){	
-//  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
+//  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE 	
 
-	try{		
+	try{
 		int nodoinit, nodofine;
 		nodoinit = nodoStart;
 		nodofine = nodoStart+1;

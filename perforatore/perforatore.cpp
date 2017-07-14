@@ -11,7 +11,7 @@
 #include "solver.h"
 #include "CPLEXsolver.h"
 #include "Nearsolver.h"
-//#include "TwoOptSolver.h"
+#include "TwoOptSolver.h"
 
 using namespace std;
 
@@ -60,15 +60,15 @@ int main(int argc, char const *argv[]) {
 	
 	// 	FLAG DI ATTIVAZIONE / DISATTIVAZIONE DEI SOLVER E DELLE ALTRE FUNZIONALITÀ 
 	bool attivoCPLEX = false;				// solver CPLEX attivato
-	bool attivoNS = true;				// NearSolver attivato
-	bool attivoTWO = false;				// TwoOptSolver attivato
+	bool attivoNS = false;				// NearSolver attivato
+	bool attivoTWO = true;				// TwoOptSolver attivato
 	bool scriviIstanza = false;			// scrittura istanza attivata
 	bool SolNS = false;					// scrittura soluzione NearSolver attivata
-	bool SolTWO = false;					// scrittura soluzione TwoOptSolver attivata
+	bool SolTWO = true;					// scrittura soluzione TwoOptSolver attivata
 	bool qualsiasiSTART = true;			// ricerca nodo iniziale ottimo attivata
 	
 	//	VALORI DEFAULT PER I SOLVER 
-	const int MAX_2OPT = 10000;
+	const int MAX_2OPT = 100;
 	const int MAX_K = 30;
 	int START = 0;
 	const int MAX_CPLEX_PROB = 300;			// limite massimo nodi per la generazione del problema CPLEX
@@ -103,25 +103,25 @@ int main(int argc, char const *argv[]) {
 		}
 	
 	
-/*	TwoOptSolver* TWO;
+	TwoOptSolver* TWO;
 	if (attivoTWO){
 		TWO = new TwoOptSolver(ist, MAX_2OPT);
-		TWO->risolvi(START);
+		TWO->risolvi();
 		if (SolTWO)
 			TWO->getSoluzione()->toFileJSON("util/solTwo_Opt.txt");
-		} */
+		} 
 	
 
 	
 	cout << "\n\n -------  RISULTATI FINALI  -------- \n\n";
 	if (attivoCPLEX) cout << " Il minimo per CPLEX è: "<< CPX->getFO() << " in "<<CPX->getTempoRisoluzione()<< " secondi " << endl;
 	if (attivoNS)	cout << " Il minimo per Nearest Neighbor è: "<< NS->getFO() << " in " << NS->getTempoRisoluzione() << " secondi " << endl;
-	//if (attivoTWO)	cout << " Il minimo per TwoOpt Solver è: "<< TWO->getFO()  << " in " << TWO->getTempoRisoluzione() << " secondi " << endl;
+	if (attivoTWO)	cout << " Il minimo per TwoOpt Solver è: "<< TWO->getFO()  << " in " << TWO->getTempoRisoluzione() << " secondi " << endl;
 	
 	
 	// CANCELLA OGGETTI DALLO STACK
 	if (attivoNS) delete NS;
-//	if (attivoTWO) delete TWO;
+	if (attivoTWO) delete TWO;
 	
 	delete ist;
 	
