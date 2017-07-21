@@ -1,6 +1,11 @@
 # memoco-course-project
 
-Solving and measuring the performance of a shortest path problem
+Solving and measuring the performance of a TSP (Travelling Salesman Problem).
+During this project I used the exact CPLEX solver and some Solvers that use Heuristics (Local Search, Tabu Search).
+If you need some clarifications about how the project works and how the Heuristics are implemented.
+
+
+__________________________________________________________
 
 MEMOCO stands for MEthods and MOdels for Combinatorial Optimization - a course for the Master Degree in Computer Science at University of Padua (Italy)
 
