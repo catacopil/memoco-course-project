@@ -1,11 +1,11 @@
 /*
 *	Classe TwoOptMove, definisce una mossa 2-opt per una determinata soluzione di un'istanza
-*	Un oggetto TwoOptMove può rappresentare una mossa valida o meno, se è valida allora porta un miglioramento alla soluzione
+*	Un oggetto TwoOptMove può rappresentare una mossa valida o meno, se è valida significa che porta un miglioramento alla soluzione
 */
 
 
-#ifndef TWOOPTMOVE_H
-#define TWOOPTMOVE_H
+#ifndef TWO_OPT_MOVE_H
+#define TWO_OPT_MOVE_H
 
 #include <cstdio>
 #include <cstdlib>
@@ -36,4 +36,4 @@ private:
 
 
 
-#endif // TWOOPTMOVE_H
+#endif // TWO_OPT_MOVE_H

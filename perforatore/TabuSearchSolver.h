@@ -5,8 +5,8 @@
 */
 
 
-#ifndef TWO_OPT_SOLVER_H
-#define TWO_OPT_SOLVER_H
+#ifndef TABU_SEARCH_SOLVER_H
+#define TABU_SEARCH_SOLVER_H
 
 #include <iostream>
 #include <string>
@@ -21,25 +21,27 @@
 using namespace std;
 
 
-class TwoOptSolver: public Solver{
+class TabuSearchSolver: public Solver{
 public:
 	static bool verbose;								// indica se stampare sulla console messaggi di log sull'avanzamento del programma
 
-	TwoOptSolver(Istanza*, int);							// Creazione del solver, collegandolo con l'oggetto Istanza che deve risolvere, richiede il numero massimo di miglioramenti desiderato (di default è 1000)
+	TabuSearchSolver(Istanza*, int, int);							// Creazione del solver, collegandolo con l'oggetto Istanza che deve risolvere, richiede la lunghezza della tabuList e il numero massimo di iterazioni
 	
-	void risolvi(double);								// avvia il solver con un determinato limite di tempo e rispettando il numero massimo di 2-opt (maxOpt)
+	void risolvi(double);								// avvia il solver con un determinato limite di tempo di esecuzione (rispetta anche maxIter)
 	Soluzione* getSoluzione();							// ritorna la Soluzione
 	double getTempoRisoluzione();							// ritorna il tempo (in secondi) impiegato per la risoluzione, se non ancora risolto ritorna -1
 	double getFO();									// ritorna il valore della Funzione Obiettivo, se non ancora risolto ritorna -1
 	
- 	~TwoOptSolver();
+ 	~TabuSearchSolver();
 
 private:
 	double tempoRisoluzione;
 	double valoreFO;
-	const int maxOpt;									// il massimo per di miglioramenti desiderati
+	const int maxIter;									// il massimo numero di iterazioni consentite
+	vector<int> tabuList;								// implementazione della TabuList, contiene un valore (quando il punto è stato utilizzato per una 2-opt) per ogni punto dell'istanza
+	int tabuListLenght;									// lunghezza della TabuList (quante iterazioni considerare per dire se una mossa è tabu o meno)
 
 };
 
 
-#endif // TWO_OPT_SOLVER_H
+#endif // TABU_SEARCH_SOLVER_H

@@ -23,7 +23,7 @@ NearSolver::~NearSolver(){
 }
 
 
-void NearSolver::risolvi(int nodoStart){	
+void NearSolver::risolvi(int nodoStart, double timeLimit){	
 //  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE 	
 
 	try{
@@ -38,17 +38,18 @@ void NearSolver::risolvi(int nodoStart){
 			nodoinit = 0;
 			nodofine = N;
 		}
+		bool stop = false;
 		
 		cout << "\n Inizia l'esecuzione del NearSolver...." << endl;
 		chrono::high_resolution_clock::time_point inizio = chrono::high_resolution_clock::now();
 		
-		for (int start=nodoinit; start<nodofine; start++){
+		for (int start=nodoinit; start<nodofine && !stop; start++){
 			int ultimoinserito = start;
 			int ilminore = 0;
 			
 			vector<Punto> &nodiIstanza = *(ist->getNodi());		// vector contenente i punti non ancora scelti per la soluzione
 			vector<short> indiciNodi;						// vector contenente gli indici (in istanza) dei punti dentro nodiIstanza
-			vector<short> indiciSoluzione;				// vector contenente gli indici (in istanza) della soluzione
+			vector<short> indiciSoluzione;					// vector contenente gli indici (in istanza) della soluzione
 			
 			for (short k=0; k<N; k++)
 				indiciNodi.push_back(k);
@@ -59,7 +60,7 @@ void NearSolver::risolvi(int nodoStart){
 			indiciSoluzione.push_back(indiciNodi[ultimoinserito]);
 			indiciNodi.erase(indiciNodi.begin()+ultimoinserito);
 			
-			for (int i=1; i<N; i++){
+			for (int i=1; i<N && !stop; i++){
 				// parto con i=1 perché il primo l'ho già inserito e faccio girare il ciclo N-1 volte 
 				// scelgo il prossimo nodo
 				double minDist = DBL_MAX;
@@ -79,7 +80,19 @@ void NearSolver::risolvi(int nodoStart){
 				nodiIstanza.erase(nodiIstanza.begin()+ilminore);
 				indiciSoluzione.push_back(indiciNodi[ilminore]);
 				indiciNodi.erase(indiciNodi.begin()+ilminore);
+				
+				// criterio di STOP
+				if (start==nodoinit) continue;				// al primo giro evito di fare i controlli altrimenti non ho neanche una soluzione
+				chrono::high_resolution_clock::time_point t_now = chrono::high_resolution_clock::now();
+				auto duration = chrono::duration_cast<chrono::microseconds>(t_now - inizio);
+				double tempoImpiegato = duration.count();			// i microsecondi impiegati finora
+				tempoImpiegato = tempoImpiegato/1000000;
+				if (tempoImpiegato > timeLimit){
+					//cout << " Attivo lo stop con tempoImpiegato="<< tempoImpiegato <<endl;
+					stop = true;
+					}
 			}
+			if (stop) continue;			// se ho fermato il solver non aggiorno la soluzione con quella attuale perché non è pronta
 		
 			// aggiorno la funzione obiettivo e la soluzione se migliore
 			Soluzione* ultimaSol = new Soluzione(ist, &indiciSoluzione);
@@ -92,6 +105,8 @@ void NearSolver::risolvi(int nodoStart){
 				}
 			else 
 				delete ultimaSol;
+				
+			
 			}
 		valoreFO = minFO;
 		// calcola e stampa il tempo impiegato 

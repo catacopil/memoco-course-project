@@ -3,38 +3,42 @@
 *
 */
 
-#include "TwoOptSolver.h"
+#include "TabuSearchSolver.h"
 #include <iostream>
 
 
 
-bool TwoOptSolver::verbose = false;
+bool TabuSearchSolver::verbose = false;
 
-TwoOptSolver::TwoOptSolver(Istanza* i, int M=100):Solver(i),maxOpt(M){			// il numero massimo di miglioramenti richiesti di default è 1000
+TabuSearchSolver::TabuSearchSolver(Istanza* i, int L=7, int M=100):Solver(i), maxIter(M), tabuListLenght(L){	
 //  -------	COSTRUTTORE SEMPLICE
 	tempoRisoluzione = -1.0;
 	valoreFO = -1.0;
 	
-	if (verbose) cout << " Solver TwoOpt creato per l'istanza di richiesta \n";
+	if (verbose) cout << " Solver Tabu Search creato per l'istanza di richiesta \n";
 }
 
-TwoOptSolver::~TwoOptSolver(){
+TabuSearchSolver::~TabuSearchSolver(){
 //  -------	DISTRUTTORE 
 }
 
 
-void TwoOptSolver::risolvi(double timeLimit){
-//  ------- 	AVVIA IL SOLVER PER TROVARE LA SOLUZIONE
+void TabuSearchSolver::risolvi(double timeLimit){
+//  ------- 	AVVIA IL SOLVER
 
 	try{
-		cout << "\n Inizia l'esecuzione del Solver TwoOpt...." << endl;
+		cout << "\n Inizia l'esecuzione del Solver Tabu Search...." << endl;
 		chrono::high_resolution_clock::time_point inizio = std::chrono::high_resolution_clock::now();
+		
 		
 	// ----------  CREAZIONE SOLUZIONE INIZIALE 		-------------
 		int N = ist->getN();
 		double minFO = DBL_MAX;							// il valore della migliore soluzione trovata, inizializzato a DBL_MAX
 		int primoinserito = 0;
 		int ilminore = 0;
+		
+		for (int i=0; i<N; i++)							// inizializzazione tabuList
+			tabuList.push_back(-tabuListLenght-1);
 			
 		vector<Punto> &nodiIstanza = *(ist->getNodi());		// vector contenente i punti non ancora scelti per la soluzione
 		vector<short> indiciNodi;						// vector contenente gli indici (in istanza) dei punti dentro nodiIstanza
@@ -78,22 +82,29 @@ void TwoOptSolver::risolvi(double timeLimit){
 		bool stop = false;							// indica se devo fermarmi durante le iterazioni di ricerca
 		bool trovato = false;						// indica se ho trovato qualche mossa 2-opt
 		int count = 0;
-		int maxMoves = 5;							// indica il numero di mosse 2-opt da esplorare prima di scegliere la migliore
-		if (N > 300) maxMoves = 7;
-		if (N > 2000) maxMoves = 10;
 		
 		while (!stop){
 			// cerco delle mosse 2opt da attuare  (max 4-5?)
 			trovato = false;
 			TwoOptMove bestMove(ist, sol, -1, -1);
-			double bestImprovement = 0;
-			int moves = 0;
+			double bestImprovement = -DBL_MAX;
 			
-			for (int i=0; i<indiciSoluzione.size()-1 && moves < maxMoves && !stop; i++){
-				for (int j=i+1; j<indiciSoluzione.size()-1 && moves < maxMoves; j++){
+			for (int i=0; i<indiciSoluzione.size()-1 && !stop; i++){
+				for (int j=i+1; j<indiciSoluzione.size()-1; j++){
 					if (i==j || j==i+1 || i==j+1) continue;
+					/*
+					if ((count - tabuList[sol->getIndicePunto(i+1)]<= tabuListLenght) 
+						&& (count - tabuList[sol->getIndicePunto(j)]<= tabuListLenght)){ 		// controllo se è una mossa tabu
+						cout << sol->getIndicePunto(i+1) << " e "<< sol->getIndicePunto(j) << " sono ancora Tabu! \n";
+						continue;	
+						} */
 					TwoOptMove newMove(ist, sol, i, j);
-					if (newMove.valida && newMove.miglioramento>0) moves++;
+					if ( newMove.valida && (count - tabuList[sol->getIndicePunto(i+1)]<= tabuListLenght) 
+						&& (count - tabuList[sol->getIndicePunto(j)]<= tabuListLenght)){ 		// controllo se è una mossa tabu
+						//cout << sol->getIndicePunto(i+1) << " e "<< sol->getIndicePunto(j) << " sono ancora Tabu! \n";
+						continue;	
+						}
+						
 					if (newMove.valida && newMove.miglioramento > bestImprovement ){
 						trovato = true;
 						bestMove = newMove;
@@ -101,6 +112,7 @@ void TwoOptSolver::risolvi(double timeLimit){
 						if (verbose) cout << " Nuovo BestImprovement trovato = "<< bestImprovement << endl;
 						}
 					}
+				// ---------  	CRITERI DI ARRESTO
 				chrono::high_resolution_clock::time_point t_now = chrono::high_resolution_clock::now();
 				auto duration = chrono::duration_cast<chrono::microseconds>(t_now - inizio);
 				double tempoImpiegato = duration.count();			// i microsecondi impiegati finora
@@ -108,19 +120,25 @@ void TwoOptSolver::risolvi(double timeLimit){
 				if (tempoImpiegato > timeLimit){
 					stop = true;
 					trovato = false;
+					cout << " Tempo scaduto. Fermo il Solver \n";
 					}
 				}
 			
-			// scelgo tra le mosse trovate la migliore (bestMove) e la applico aggiornando la soluzione
+			// scelgo tra le mosse trovate la migliore (guadagno più alto) e la attuo aggiornando la soluzione
 			// devo aggiornare indiciSoluzione
-			if (trovato){
-				// ok, ho una nuova mossa da attuare
-				
+			if (trovato){			// ok, ho una nuova mossa da attuare
 				int indiceA = bestMove.getPrimoSegmento();
 				int indiceB = indiceA+1;
 				int indiceC = bestMove.getSecondoSegmento();
 				if (indiceA >= indiceC)
-					throw runtime_error(" Errore durante lo switch di due Punti in Two-Opt ----> indiceA >= indiceC! "); 
+					throw runtime_error(" Errore durante lo switch di due Punti in TabuSearch ----> indiceA >= indiceC! "); 
+				
+				// aggiornamento della tabuList
+				count++;
+				tabuList[sol->getIndicePunto(indiceB)] = count;
+				tabuList[sol->getIndicePunto(indiceC)] = count;
+				if (verbose) cout << count << " add alle mosse tabu: "<< sol->getIndicePunto(indiceB) << " e " << sol->getIndicePunto(indiceC) <<endl;
+				
 				short temp = indiciSoluzione[indiceB];						// scambio i punti interessati (sarebbero B e C)
 				indiciSoluzione[indiceB] = indiciSoluzione[indiceC];
 				indiciSoluzione[indiceC] = temp;
@@ -133,35 +151,30 @@ void TwoOptSolver::risolvi(double timeLimit){
 			 		indiciSoluzione[k2] = temp;
 			 		k2--;
 			 		}
-			 	// aggiorno la soluzione e il contatore
+			 	// aggiorno la soluzione
 			 	delete sol;
 			 	sol = new Soluzione(ist, &indiciSoluzione);
-			 	count++;
+			 	
 			 	if (verbose) cout << " Soluzione aggiornata: "<<sol->getFO()<< " | count = "<< count <<endl<<endl;
 			}
 			
-			// controllo se mi devo fermare o no
-			chrono::high_resolution_clock::time_point t_now = chrono::high_resolution_clock::now();
-			auto duration = chrono::duration_cast<chrono::microseconds>(t_now - inizio);
-			double tempoImpiegato = duration.count();			// i microsecondi impiegati finora
-			tempoImpiegato = tempoImpiegato/1000000;
-			if (count >= maxOpt || !trovato || tempoImpiegato > timeLimit){
-				stop = true;
-				if (count >= maxOpt)
-					cout << " Raggiunto il limite massimo di operazioni. count = " << count <<endl; 
-				if (tempoImpiegato > timeLimit)
-					cout << " Tempo scaduto. Fermo il Solver \n";
-			}
+			// ---------  	CRITERI DI ARRESTO
 			
+			if (count >= maxIter || !trovato){
+				stop = true;
+				if (count >= maxIter)
+					cout << " Raggiunto il limite massimo di operazioni. count = " << count <<endl; 
+			}
 		}
+
 			
 		if (verbose)	cout << " Eseguite "<< count << " two-opt";
-		if (!trovato && verbose)		cout << " Non ho più trovato miglioramenti !";
+		if (!trovato && verbose)		cout << " Non ho più trovato miglioramenti !\n";
 	
+		// aggiorno la funzione obiettivo
 		valoreFO = sol->getFO();
 		if (verbose) cout << " Soluzione = "<< valoreFO <<endl;
-		
-		
+			
 		chrono::high_resolution_clock::time_point fine = chrono::high_resolution_clock::now();
 		auto duration = chrono::duration_cast<chrono::microseconds>(fine - inizio);
 		double microsec = duration.count();
@@ -174,29 +187,30 @@ void TwoOptSolver::risolvi(double timeLimit){
 		else
 			cout << " Problema risolto in "<< tempoRisoluzione <<" secondi"<< endl;
 		
-		cout << " Valore funzione obiettivo per TwoOptSolver: " << valoreFO << " | count 2-opt:"<< count <<"]"<<endl<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
+		cout << " Valore funzione obiettivo per TabuSearchSolver: " << valoreFO << " | count 2-opt:"<< count <<"]"<<endl<<endl;			// stampa il valore della funzione obiettivo per la soluzione ottima
 		
 	}
 	catch (std::exception& e) {
-		cout << ">>> Eccezione durante l'esecuzione del Solver TwoOpt: " << e.what() << endl;
+		cout << ">>> Eccezione durante l'esecuzione del Solver TabuSearch: " << e.what() << endl;
 	}
 	//cout << " Problema risolto con il Solver Nearest Neighbor! \n";
 }
 
 
-double TwoOptSolver::getFO(){
+double TabuSearchSolver::getFO(){
 	return valoreFO;
 }
 
 
-double TwoOptSolver::getTempoRisoluzione(){
+double TabuSearchSolver::getTempoRisoluzione(){
 	return tempoRisoluzione;
 }
 
 
-Soluzione* TwoOptSolver::getSoluzione(){
+Soluzione* TabuSearchSolver::getSoluzione(){
 	if (sol != NULL)
 		return sol;
 	sol = new Soluzione(ist);						// altrimenti crea soluzione di default
 	return sol;
 }
+

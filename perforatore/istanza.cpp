@@ -165,7 +165,7 @@ string Istanza::toFileJSON(string nomeFile = ""){
 	}
 	else
 		cout << "Errore scrittura file "<< nomeFileJSON << endl;
-	cout << " Generato il file " << nomeFileJSON << " con l'istanza in formato JSON | " << N << " nodi" << endl;
+	cout << " Generato il file " << nomeFileJSON << " con l'istanza in formato array | " << N << " nodi" << endl;
 	return nomeFileJSON;
 }
 

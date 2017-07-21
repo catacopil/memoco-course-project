@@ -26,7 +26,7 @@ public:
 
 	NearSolver(Istanza*);								// Creazione del solver, collegandolo con l'oggetto Istanza che deve risolvere
 	
-	void risolvi(int);
+	void risolvi(int, double);							// Metodo che avvia il solver, prende il punto iniziale (-1 significa provarli tutti) e il limite di tempo
 	Soluzione* getSoluzione();							// ritorna la Soluzione
 	double getTempoRisoluzione();							// ritorna il tempo (in secondi) impiegato per la risoluzione, se non ancora risolto ritorna -1
 	double getFO();									// ritorna il valore della Funzione Obiettivo, se non ancora risolto ritorna -1

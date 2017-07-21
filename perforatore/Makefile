@@ -6,7 +6,7 @@ CPX_INCDIR  = /opt/ibm/ILOG/CPLEX_Studio126/cplex/include
 CPX_LDPATH  = /opt/ibm/ILOG/CPLEX_Studio126/cplex/lib/x86-64_linux/static_pic
 CPX_LDADD = -lcplex -lm -pthread
 
-OBJ = perforatore.o TwoOptSolver.o Nearsolver.o CPLEXsolver.o TwoOptMove.o solver.o soluzione.o istanza.o punto.o 
+OBJ = perforatore.o TabuSearchSolver.o TwoOptSolver.o Nearsolver.o CPLEXsolver.o TwoOptMove.o solver.o soluzione.o istanza.o punto.o 
 
 OBJTEST = perforatore.o Nearsolver.o CPLEXsolver.o solver.o soluzione.o istanza.o punto.o 
 
@@ -16,10 +16,7 @@ OBJTEST = perforatore.o Nearsolver.o CPLEXsolver.o solver.o soluzione.o istanza.
 main: $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) -o perforatore -L$(CPX_LDPATH) $(CPX_LDADD)
 	
-test: $(OBJTEST)
-	$(CXX) $(CXXFLAGS) $(OBJTEST) -o perforatore -L$(CPX_LDPATH) $(CPX_LDADD)
-	
 clean:
-	rm -rf $(OBJ) perforatore punto.o istanza.o soluzione.o CPLEXsolver.o Nearsolver.o Miosolver.o TwoOptSolver.o TwoOptMove.o
+	rm -rf $(OBJ) perforatore punto.o istanza.o soluzione.o CPLEXsolver.o Nearsolver.o TwoOptSolver.o TwoOptMove.o TabuSearchSolver.o
 
 .PHONY: clean

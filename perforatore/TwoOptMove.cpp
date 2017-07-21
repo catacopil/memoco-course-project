@@ -11,8 +11,8 @@ bool TwoOptMove::verbose = false;
 TwoOptMove::TwoOptMove(Istanza* i, Soluzione* s, int primo, int secondo){
 	ist = i;
 	sol = s;
-	primoSegmento = primo;							// il primo segmento è definito dai punti di indice primoSegmento e (primoSegmento+1)
-	secondoSegmento = secondo;						// il secondo segmento è definito dai punti di indice secondoSegmento e (secondoSegmento+1)
+	primoSegmento = primo;							// il primo segmento è definito dai punti di indice (nella soluzione) primoSegmento e (primoSegmento+1)
+	secondoSegmento = secondo;						// il secondo segmento è definito dai punti di indice (nella soluzione) secondoSegmento e (secondoSegmento+1)
 	valida = false;								// la mossa non è valida, fino a prova contraria
 	miglioramento = -1;
 	
@@ -27,7 +27,8 @@ TwoOptMove::TwoOptMove(Istanza* i, Soluzione* s, int primo, int secondo){
 		//if (verbose) cout << "NO ";
 		return;
 	}
-	
+	// altrimenti mossa valida, anche se peggiora
+	valida = true;
 	// CONTROLLO SE C'È UN MIGLIORAMENTO
 	
 	Punto A = ist->getPunto(indexA);
@@ -38,11 +39,11 @@ TwoOptMove::TwoOptMove(Istanza* i, Soluzione* s, int primo, int secondo){
 	double attualeDist = A.distanza(&B) + C.distanza(&D);
 	double nuovaDist = A.distanza(&C) + B.distanza(&D);
 	
-	if (nuovaDist < attualeDist){
-		valida = true;
+	//if (nuovaDist < attualeDist){
+		
 		miglioramento = attualeDist - nuovaDist;
-		if (verbose) cout << " Trovata mossa 2-opt che porta miglioramento | A="<< indexA << " B=" << indexB << " C=" << indexC << " D=" << indexD << endl;
-	}
+		if (verbose) cout << " Trovata mossa 2-opt che porta miglioramento di "<< miglioramento << " | A="<< indexA << " B=" << indexB << " C=" << indexC << " D=" << indexD << endl;
+	//}
 	
 }
 
