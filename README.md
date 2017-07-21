@@ -2,7 +2,7 @@
 
 Solving and measuring the performance of a TSP (Travelling Salesman Problem).
 During this project I used the exact CPLEX solver and some Solvers that use Heuristics (Local Search, Tabu Search).
-If you need some clarifications about how the project works and how the Heuristics are implemented.
+If you need some clarifications about how the project works and how the Heuristics are implemented, just write me.
 
 
 __________________________________________________________
